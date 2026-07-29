@@ -1,0 +1,8 @@
+numpy>=1.22
+rdkit>=2022.9
+
+[dev]
+pytest>=7
+pytest-cov>=4
+ruff>=0.4
+mypy>=1.5

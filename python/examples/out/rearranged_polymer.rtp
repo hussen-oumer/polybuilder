@@ -1,0 +1,281 @@
+[ bondedtypes ]
+; junc  ang  dih  imp
+ 1 1 1 1
+
+[ KPH ]
+ [ atoms ]
+  S1     opls_493   0.0000   1
+  O1     opls_494   0.0000   1
+  O2     opls_494   0.0000   1
+  O3     opls_494   0.0000   1
+  OA     opls_467   0.0000   1
+ [ bonds ]
+  O1     S1
+  O2     S1
+  O3     S1
+  OA     S1
+  CC      -BCH2
+  BCH2    +CC
+
+[ DAF ]
+ [ atoms ]
+  CC     opls_141   0.0000   1
+  BCH2   opls_135   0.0000   1
+  H1     opls_140   0.0000   1
+  H29    opls_140   0.0000   1
+  H30    opls_140   0.0000   1
+  CG     opls_145   0.0000   2
+  CD1    opls_145   0.0000   2
+  CE1    opls_145   0.0000   2
+  CZ     opls_145   0.0000   2
+  CE2    opls_145   0.0000   2
+  CD2    opls_145   0.0000   2
+  H2     opls_140   0.0000   2
+  H3     opls_140   0.0000   2
+  H27    opls_140   0.0000   2
+  H28    opls_140   0.0000   2
+  CBZ    opls_136   0.0000   3
+  N1     opls_103   0.0000   3
+  CN1    opls_136   0.0000   3
+  CN2    opls_136   0.0000   3
+  CN3    opls_136   0.0000   3
+  CN4    opls_136   0.0000   3
+  CN5    opls_136   0.0000   3
+  CN6    opls_136   0.0000   3
+  H4     opls_140   0.0000   3
+  H5     opls_140   0.0000   3
+  H6     opls_140   0.0000   3
+  H7     opls_140   0.0000   3
+  H8     opls_140   0.0000   3
+  H9     opls_140   0.0000   3
+  H19    opls_140   0.0000   3
+  H20    opls_140   0.0000   3
+  H21    opls_140   0.0000   3
+  H22    opls_140   0.0000   3
+  H23    opls_140   0.0000   3
+  H24    opls_140   0.0000   3
+  H25    opls_140   0.0000   3
+  H26    opls_140   0.0000   3
+  N2     opls_103   0.0000   4
+  CB1    opls_136   0.0000   4
+  CB2    opls_136   0.0000   4
+  CB3    opls_136   0.0000   4
+  CB4    opls_135   0.0000   4
+  H10    opls_140   0.0000   4
+  H11    opls_140   0.0000   4
+  H12    opls_140   0.0000   4
+  H13    opls_140   0.0000   4
+  H14    opls_140   0.0000   4
+  H15    opls_140   0.0000   4
+  H16    opls_140   0.0000   4
+  H17    opls_140   0.0000   4
+  H18    opls_140   0.0000   4
+ [ bonds ]
+  CC     CG
+  BCH2   CC
+  CC     H1
+  CD1    CG
+  CD2    CG
+  CD1    CE1
+  CD1    H2
+  CE1    CZ
+  CE1    H3
+  CBZ    CZ
+  CE2    CZ
+  CBZ    N1
+  CBZ    H4
+  CBZ    H5
+  CN1    N1
+  CN4    N1
+  CN6    N1
+  CN1    CN2
+  CN1    H6
+  CN1    H7
+  CN2    N2
+  CN2    H8
+  CN2    H9
+  CB1    N2
+  CN3    N2
+  CN5    N2
+  CB1    CB2
+  CB1    H10
+  CB1    H11
+  CB2    CB3
+  CB2    H12
+  CB2    H13
+  CB3    CB4
+  CB3    H14
+  CB3    H15
+  CB4    H16
+  CB4    H17
+  CB4    H18
+  CN3    CN4
+  CN3    H19
+  CN3    H20
+  CN4    H21
+  CN4    H22
+  CN5    CN6
+  CN5    H23
+  CN5    H24
+  CN6    H25
+  CN6    H26
+  CD2    CE2
+  CE2    H27
+  CD2    H28
+  BCH2   H29
+  BCH2   H30
+  BCH2    +CC
+
+[ DAR ]
+ [ atoms ]
+  CC     opls_141   0.0000   1
+  BCH2   opls_135   0.0000   1
+  H1     opls_140   0.0000   1
+  H29    opls_140   0.0000   1
+  H30    opls_140   0.0000   1
+  CG     opls_145   0.0000   2
+  CD1    opls_145   0.0000   2
+  CE1    opls_145   0.0000   2
+  CZ     opls_145   0.0000   2
+  CE2    opls_145   0.0000   2
+  CD2    opls_145   0.0000   2
+  H2     opls_140   0.0000   2
+  H3     opls_140   0.0000   2
+  H27    opls_140   0.0000   2
+  H28    opls_140   0.0000   2
+  CBZ    opls_136   0.0000   3
+  N1     opls_103   0.0000   3
+  CN1    opls_136   0.0000   3
+  CN2    opls_136   0.0000   3
+  CN3    opls_136   0.0000   3
+  CN4    opls_136   0.0000   3
+  CN5    opls_136   0.0000   3
+  CN6    opls_136   0.0000   3
+  H4     opls_140   0.0000   3
+  H5     opls_140   0.0000   3
+  H6     opls_140   0.0000   3
+  H7     opls_140   0.0000   3
+  H8     opls_140   0.0000   3
+  H9     opls_140   0.0000   3
+  H19    opls_140   0.0000   3
+  H20    opls_140   0.0000   3
+  H21    opls_140   0.0000   3
+  H22    opls_140   0.0000   3
+  H23    opls_140   0.0000   3
+  H24    opls_140   0.0000   3
+  H25    opls_140   0.0000   3
+  H26    opls_140   0.0000   3
+  N2     opls_103   0.0000   4
+  CB1    opls_136   0.0000   4
+  CB2    opls_136   0.0000   4
+  CB3    opls_136   0.0000   4
+  CB4    opls_135   0.0000   4
+  H10    opls_140   0.0000   4
+  H11    opls_140   0.0000   4
+  H12    opls_140   0.0000   4
+  H13    opls_140   0.0000   4
+  H14    opls_140   0.0000   4
+  H15    opls_140   0.0000   4
+  H16    opls_140   0.0000   4
+  H17    opls_140   0.0000   4
+  H18    opls_140   0.0000   4
+ [ bonds ]
+  CC     CG
+  BCH2   CC
+  CC     H1
+  CD1    CG
+  CD2    CG
+  CD1    CE1
+  CD1    H2
+  CE1    CZ
+  CE1    H3
+  CBZ    CZ
+  CE2    CZ
+  CBZ    N1
+  CBZ    H4
+  CBZ    H5
+  CN1    N1
+  CN4    N1
+  CN6    N1
+  CN1    CN2
+  CN1    H6
+  CN1    H7
+  CN2    N2
+  CN2    H8
+  CN2    H9
+  CB1    N2
+  CN3    N2
+  CN5    N2
+  CB1    CB2
+  CB1    H10
+  CB1    H11
+  CB2    CB3
+  CB2    H12
+  CB2    H13
+  CB3    CB4
+  CB3    H14
+  CB3    H15
+  CB4    H16
+  CB4    H17
+  CB4    H18
+  CN3    CN4
+  CN3    H19
+  CN3    H20
+  CN4    H21
+  CN4    H22
+  CN5    CN6
+  CN5    H23
+  CN5    H24
+  CN6    H25
+  CN6    H26
+  CD2    CE2
+  CE2    H27
+  CD2    H28
+  BCH2   H29
+  BCH2   H30
+  CC      -BCH2
+  BCH2    +CC
+
+[ MCL ]
+ [ atoms ]
+  CC     opls_139   0.0000   1
+  CB     opls_135   0.0000   2
+  H1     opls_140   0.0000   2
+  H2     opls_140   0.0000   2
+  H3     opls_140   0.0000   2
+  CD     opls_465   0.0000   3
+  OD2    opls_466   0.0000   3
+  OD1    opls_467   0.0000   3
+  CE     opls_490   0.0000   3
+  H4     opls_140   0.0000   3
+  H5     opls_140   0.0000   3
+  H6     opls_140   0.0000   3
+ [ bonds ]
+  CB     CC
+  CC     CD
+  CB     H1
+  CB     H2
+  CB     H3
+  CD     OD2
+  CD     OD1
+  CE     OD1
+  CE     H4
+  CE     H5
+  CE     H6
+  CC      -BCH2
+
+[ KPT ]
+ [ atoms ]
+  OA     opls_467   0.0000   1
+  S1     opls_493   0.0000   1
+  O1     opls_494   0.0000   1
+  O2     opls_494   0.0000   1
+  O3     opls_494   0.0000   1
+ [ bonds ]
+  OA     S1
+  O1     S1
+  O2     S1
+  O3     S1
+  CC      -BCH2
+  BCH2    +CC
+

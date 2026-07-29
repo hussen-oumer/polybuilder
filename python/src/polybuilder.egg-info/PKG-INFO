@@ -1,0 +1,291 @@
+Metadata-Version: 2.4
+Name: polybuilder
+Version: 0.4.0
+Summary: Build 3D polymer structures (PDB) and GROMACS residue topologies (RTP) from vinyl monomer SMILES.
+Author: Polybuilder contributors
+License: MIT
+Project-URL: Homepage, https://github.com/hussen-oumer/polybuilder
+Keywords: chemistry,polymer,gromacs,rdkit,opls,molecular-dynamics
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Chemistry
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=1.22
+Requires-Dist: rdkit>=2022.9
+Provides-Extra: dev
+Requires-Dist: pytest>=7; extra == "dev"
+Requires-Dist: pytest-cov>=4; extra == "dev"
+Requires-Dist: ruff>=0.4; extra == "dev"
+Requires-Dist: mypy>=1.5; extra == "dev"
+
+# polybuilder
+
+Build 3D polymer structures (PDB) and GROMACS residue topologies (RTP) from vinyl monomer SMILES, with OPLS-AA atom types.
+
+## Features
+
+- Assemble homo- or block copolymers from a small library of comonomers:
+  - **Sulfobetaines** with a tunable CH2 bridge (DMAPS, A3316, plus M3295/A3367/A3361 in the example library).
+  - **Neutral** and **styrenic** single-fragment monomers (MMA, NIPAM, IBOA, DABCO in the example library).
+  - Any additional monomer you supply via a plugin file — no changes to the package needed.
+- Optional **radical initiator end caps** (KPS sulfate, AIBA amidinium, TBHP tert-butoxy, or user-registered ones).
+- Emits both a PDB (heavy/hydrogen atoms interleaved per residue) and a `.rtp` (atoms sorted by charge-group number, backbone `+CC` / `-BCH2` connectors written).
+- Optional post-processing with `gmx editconf` to centre the molecule and set a periodic box.
+- Non-interactive CLI for automation, plus an interactive prompt for manual runs.
+
+## Installation
+
+```bash
+pip install .
+# or, for development:
+pip install -e ".[dev]"
+```
+
+RDKit is a hard dependency. If `pip install rdkit` fails on your platform, use conda: `conda install -c conda-forge rdkit`.
+
+## Command-line usage
+
+Non-interactive:
+
+```bash
+# MMA + DMAPS block copolymer, KPS initiator on both ends
+polybuilder build \
+    --comonomer DMAPS \
+    --n-first 3 --n-comonomer 1 --repeats 4 \
+    --bridge 3 --initiator KPS --ends both \
+    --output-dir ./out
+```
+
+By default, `--first-residue` is `MMA`. To pair two *arbitrary* residues instead — e.g. a NIPAM/DABCO thermoresponsive-cationic copolymer with sulfate end groups from KPS:
+
+```bash
+polybuilder build --library examples/cpp_monomers.py \
+    --first-residue NIPAM --n-first 3 \
+    --comonomer  DABCO   --n-comonomer 1 \
+    --repeats 4 --cap \
+    --initiator KPS --ends both \
+    --output-dir ./out_nipam_dabco
+```
+
+The polymer backbone forms through the C=C of each monomer — NIPAM opens at its acrylamide vinyl, DABCO opens at the *para-vinylbenzyl* on the benzene ring (**not** through the DABCO cage's N⁺s, which stay intact as pendant charges). Set the block ratio however you want; `--n-first` and `--n-comonomer` are per-block counts and `--repeats` multiplies them.
+
+An MMA homopolymer with KPS-derived sulfate ends is just:
+
+```bash
+polybuilder build \
+    --comonomer MMA --n-first 10 --n-comonomer 0 --repeats 1 --cap \
+    --initiator KPS --ends both \
+    --output-dir ./out
+```
+
+Interactive prompt (matches the old `run_pipeline.py` workflow):
+
+```bash
+polybuilder interactive
+```
+
+List everything the current registry knows about (respecting any `--library` files):
+
+```bash
+polybuilder list-monomers
+polybuilder list-monomers --library examples/cpp_monomers.py
+polybuilder list-initiators
+polybuilder list-initiators --library examples/cpp_monomers.py
+```
+
+Run `polybuilder --help` for all options. `--betaine` / `--n-betaine` are accepted as deprecated aliases for `--comonomer` / `--n-comonomer`; `--n-mma` is a deprecated alias for `--n-first` that only works when `--first-residue` is left at its default (`MMA`).
+
+## Library usage
+
+```python
+from polybuilder import build_polymer, PolymerSpec
+
+# MMA + DMAPS block copolymer
+spec = PolymerSpec(
+    comonomer="DMAPS",
+    n_first=3,
+    n_comonomer=1,
+    repeats=4,
+    extra_bridge=3,
+    cap=False,
+)
+result = build_polymer(spec, "poly.pdb", "poly.rtp")
+
+# NIPAM + DABCO copolymer (needs the example library loaded first)
+import polybuilder
+polybuilder.load_user_library("examples/cpp_monomers.py")
+
+spec = PolymerSpec(
+    first_residue="NIPAM", n_first=3,
+    comonomer="DABCO",    n_comonomer=1,
+    repeats=4, cap=True,
+    initiator="KPS", ends="both",
+)
+build_polymer(spec, "nipam_dabco.pdb", "nipam_dabco.rtp")
+```
+
+## Adding your own monomers
+
+Write a plain Python file — the package is never modified.
+
+### Sulfobetaine (head + tunable CH2 bridge + tail)
+
+```python
+# my_monomers.py
+from polybuilder import AtomSpec, BetaineBase, ResidueFragment
+from polybuilder.config import DMAPS_BASE
+
+MYBET_BASE = BetaineBase(
+    head=ResidueFragment(
+        smiles="C(C)(C(=O)OCC[N+](C)(C)",
+        atoms=(
+            AtomSpec("CC",  "opls_139", 0.0, 4),
+            AtomSpec("CB",  "opls_135", 0.0, 4),
+            # ...one AtomSpec per heavy atom, in the order they appear in the SMILES
+        ),
+    ),
+    tail=DMAPS_BASE.tail,          # reuse an existing sulfonate tail
+    bridge_ff_type="opls_136",
+    bridge_charge=0.0,
+    bridge_cgnr=3,
+)
+
+MONOMERS = {"MYBET": MYBET_BASE}   # the loader picks up MONOMERS automatically
+```
+
+### Single-fragment neutral / styrenic monomer
+
+For any vinyl monomer without a tunable bridge (e.g. an acrylamide like NIPAM, a styrenic, a bulky ester), use `ResidueFragment` directly:
+
+```python
+from polybuilder import AtomSpec, ResidueFragment
+
+MY_NEUTRAL = ResidueFragment(
+    smiles="C(C(=O)NC(C)C)",         # C=CX → drop the CH2=, keep the α-C fragment
+    atoms=(
+        AtomSpec("CC",  "opls_140", 0.0, 1),   # α-C first (renamed CC by the builder)
+        AtomSpec("CD",  "opls_235", 0.0, 2),
+        AtomSpec("OD1", "opls_236", 0.0, 2),
+        # ...one AtomSpec per heavy atom, in the order RDKit visits them
+    ),
+)
+
+MONOMERS = {"MYNEUT": MY_NEUTRAL}
+```
+
+Then build:
+
+```bash
+polybuilder build --library my_monomers.py --comonomer MYBET \
+    --n-mma 3 --n-comonomer 1 --repeats 4 --bridge 3 -o ./out
+
+polybuilder build --library my_monomers.py --comonomer MYNEUT \
+    --n-mma 1 --n-comonomer 3 --repeats 2 --bridge 0 -o ./out
+```
+
+`--library` can be repeated to combine several files. For quick prototyping without hand-writing atom types, `polybuilder pubchem <NAME> <SMILES>` prints a starter block with `opls_XXX` placeholders you can refine.
+
+### Getting the atom list right
+
+The builder walks the fragment's heavy atoms in RDKit's SMILES traversal order and applies your `AtomSpec` entries in the same order. If the count is wrong you get:
+
+```
+InvalidPolymerSpecError: Heavy-atom map exhausted while labelling side chains
+```
+
+A quick way to check the ordering before you write the entry:
+
+```python
+from rdkit import Chem
+m = Chem.MolFromSmiles("C(C(=O)NC(C)C)")
+for i, a in enumerate(a for a in m.GetAtoms() if a.GetSymbol() != "H"):
+    print(i, a.GetSymbol(), "deg", a.GetDegree(),
+          "arom" if a.GetIsAromatic() else "")
+```
+
+## Adding your own initiators
+
+Same plugin file as your monomers — expose an `INITIATORS = {...}` dict:
+
+```python
+# my_monomers.py (continued)
+from polybuilder import AtomSpec, Initiator
+
+APS_INITIATOR = Initiator(
+    name="APS",
+    # HEAD fragment: prepended to the chain SMILES. Write it so the LAST atom
+    # (in SMILES traversal order) is the atom that bonds to the polymer α-C.
+    head_smiles="S(=O)(=O)([O-])O",
+    head_atoms=(
+        AtomSpec("S1", "opls_493", 0.0, 1),
+        AtomSpec("O1", "opls_494", 0.0, 1),
+        AtomSpec("O2", "opls_494", 0.0, 1),
+        AtomSpec("O3", "opls_494", 0.0, 1),
+        AtomSpec("OA", "opls_467", 0.0, 1),
+    ),
+    # TAIL fragment: appended after the last residue. Write it so the FIRST
+    # atom is the one that bonds to the polymer α-C.
+    tail_smiles="OS(=O)(=O)[O-]",
+    tail_atoms=(
+        AtomSpec("OA", "opls_467", 0.0, 1),
+        AtomSpec("S1", "opls_493", 0.0, 1),
+        AtomSpec("O1", "opls_494", 0.0, 1),
+        AtomSpec("O2", "opls_494", 0.0, 1),
+        AtomSpec("O3", "opls_494", 0.0, 1),
+    ),
+)
+
+INITIATORS = {"APS": APS_INITIATOR}
+```
+
+Then:
+
+```bash
+polybuilder build --library my_monomers.py \
+    --comonomer MMA --n-mma 10 --n-comonomer 0 --repeats 1 --cap \
+    --initiator APS --ends both
+```
+
+Rules of thumb:
+- The head fragment reads left-to-right into the chain, so its **last** atom is the attachment. The tail fragment continues from the chain, so its **first** atom is the attachment. For a symmetric initiator these are the same fragment written in opposite orders.
+- Every heavy atom in your fragment needs one `AtomSpec` in the same order RDKit visits it. Use the SMILES walk snippet from the section above to confirm the order.
+- `--ends head` uses only `head_smiles` / `head_atoms`; `--ends tail` uses only the tail. `--ends both` uses both. `--ends none` (or omitting `--initiator`) leaves plain methyl caps.
+- The initiator atoms get their own residue codes: `<NAME[:2]>H` for head, `<NAME[:2]>T` for tail (e.g. `KPH` / `KPT` for KPS, `APH` / `APT` for APS). These are separate residue blocks in the RTP.
+
+## Example library: C++ monomers
+
+`examples/cpp_monomers.py` ports the full ../cpp/monomers.hpp library:
+
+| Monomer | Type              | Note                                          |
+|---------|-------------------|-----------------------------------------------|
+| M3295   | sulfobetaine      | DMAPS with a four-carbon sulfoalkyl tail      |
+| A3367   | sulfobetaine      | Acrylate analogue of DMAPS (no α-methyl)      |
+| A3361   | sulfobetaine      | Alias of the built-in A3316                   |
+| NIPAM   | neutral           | N-isopropylacrylamide                         |
+| IBOA    | neutral           | Isobornyl acrylate                            |
+| DABCO   | styrenic dication | Vinyl-benzyl DABCO, butyl on the other N⁺    |
+
+```bash
+polybuilder build --library examples/cpp_monomers.py --comonomer NIPAM \
+    --n-mma 1 --n-comonomer 1 --repeats 4 --bridge 0
+polybuilder build --library examples/cpp_monomers.py --comonomer DABCO \
+    --n-mma 1 --n-comonomer 1 --repeats 2 --bridge 0
+```
+
+⚠️ For NIPAM / IBOA / DABCO the OPLS atom types are best-guess placeholders — validate them against your force-field manual (or refit charges with a QM protocol) before running production MD.
+
+## Development
+
+```bash
+pip install -e ".[dev]"
+pytest
+ruff check src tests
+mypy src
+```
