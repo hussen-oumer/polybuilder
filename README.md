@@ -1,66 +1,26 @@
 # polybuilder
 
-Build homopolymers and copolymers **from SMILES only**, using RDKit — for the
-deSalSea forward-osmosis draw polymers and a downstream GROMACS workflow.
+[desalsea](https://desalsea.eu/) · [m-eraEU](https://www.m-era.net/joint-calls/joint-call-2024) · [Dipc](https://scc.dipc.org/docs/systems/hyperion)
 
-Add a monomer by typing one SMILES string. The engine finds the vinyl `C=C`,
-grows the chain head-to-tail, and optionally caps the ends with an initiator
-fragment (KPS, AIBA, TBHP). Python (ready to run) and C++ (contribution
-scaffold) share the same algorithm.
+This project is developed for [desalsea](https://desalsea.eu/) with funding from the [M-ERA.NET Joint Call 2024](https://www.m-era.net/joint-calls/joint-call-2024), and simulated on the [DIPC Hyperion](https://scc.dipc.org/docs/systems/hyperion) HPC system.
 
-**You only ever edit the SMILES library** (`monomers.py` / `monomers.hpp`).
-Never touch the connector engine (`main.py` / `polymer_builder.*`).
+Build 3D polymer structures (PDB) and GROMACS residue topologies (RTP) from
+ monomer SMILES, using OPLS-AA atom types.
 
-## Python
+One-line `homo` / `copo` commands cover the everyday cases, common monomers
+(DMAPS, A3361, A3367, DABCO, …) are built in, and you can add your own via a
+plugin file — no package changes.
 
 ```bash
-pip install rdkit
 cd python
-python run_example.py
+pip install .
+
+polybuilder homo DMAPS -n 20 --initiator KPS       # homopolymer
+polybuilder copo DMAPS DABCO -n 10                 # alternating copolymer
 ```
 
-Use it in your own script:
+## Layout
 
-```python
-from main import PolymerBuilder as PB, to_smiles, write_structure
-from monomers import MONOMERS, INITIATORS
-
-poly = PB.cap_hydrogen(PB.homopolymer(MONOMERS["A3367"], 10))
-print(to_smiles(poly))
-
-capped = PB.add_initiator(PB.homopolymer(MONOMERS["A3367"], 10),
-                          INITIATORS["KPS"], ends="both")
-write_structure(capped, "A3367_KPS_10mer.pdb")
-```
-
-Add a monomer — one line in `python/monomers.py`:
-
-```python
-"MYMONO": ZwitterionicMonomer("MYMONO", "C=C(C)C(=O)OCC[N+](C)(C)CCCS(=O)(=O)[O-]"),
-```
-
-## C++
-
-```bash
-cd cpp && mkdir build && cd build
-cmake -DRDKit_DIR=$CONDA_PREFIX/lib/cmake/rdkit ..
-make
-./polybuilder
-```
-
-Requires RDKit C++ libraries + Boost
-(`conda install -c conda-forge rdkit librdkit-dev`).
-
-## Add-ons
-
-Optional `ext_*.py` files import the engine without editing it:
-`ext_copolymer.py` (copolymer recipes) and `ext_gromacs.py` (`.pdb` + `.rtp`
-export). Run `python run_extended_example.py`.
-
-## Notes
-
-- Handles terminal-vinyl free-radical monomers (acrylate, methacrylate,
-  acrylamide, styrenic). Head-to-tail, atactic.
-- Counter-ions are added at the MD box stage, so intermediate chains carry a
-  net charge (expected).
-
+- **`python/`** — the maintained package (CLI + Python API). See
+  [`python/README.md`](python/README.md) for full usage.
+- **`cpp/`** — C++ port of the SMILES connector engine (contribution scaffold).
