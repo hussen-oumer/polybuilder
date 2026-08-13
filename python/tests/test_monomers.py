@@ -1,7 +1,7 @@
 import pytest
 
-from polybuilder.exceptions import UnknownMonomerError
-from polybuilder.monomers import (
+from polybuilder.support.exceptions import UnknownMonomerError
+from polybuilder.library.monomers import (
     build_dynamic_a3316,
     build_dynamic_dmaps,
     build_dynamic_residue,

@@ -23,8 +23,8 @@ polybuilder.load_user_library(Path(__file__).with_name("cpp_monomers.py"))
 #    - initiator + ends          :  optional radical initiator on head/tail/both
 # ---------------------------------------------------------------------------
 spec = polybuilder.PolymerSpec(
-    first_residue="MMA", n_first=0,
-    comonomer="DABCO",    n_comonomer=1,
+    first_residue="DMAPS", n_first=1,
+    comonomer="DMAPS",    n_comonomer=1,
     repeats=5,
     cap=True,
     initiator="KPS",

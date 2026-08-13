@@ -16,7 +16,7 @@ from polybuilder import (
     get_residue,
     load_user_library,
 )
-from polybuilder.config import AtomSpec
+from polybuilder.library.config import AtomSpec
 from polybuilder.library import _reset_registry_for_tests
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "cpp_monomers.py"

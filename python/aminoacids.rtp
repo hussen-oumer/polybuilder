@@ -1,0 +1,3573 @@
+; New format introduced in Gromacs 3.1.4.
+; Dont use this forcefield with earlier versions.
+
+; This residue database includes new reparameterized sidechain dihedrals 
+; from Kaminski et al (JPCB, 2001) that override the default atomtype-based 
+; dihedrals. We use set 2 for SER and THR, set 2 for ASP, and the better 
+; separate dihedrals for LEU and VAL instead of the combined ones, since we
+; can specify them here without using introducing extra atom types.
+; (That was the reason they were combined in the paper).
+
+; NB: OPLS chargegroups are not strictly neutral, since we mainly
+; use them to optimize the neighborsearching. For accurate simulations
+; you should use PME.
+
+[ bondedtypes ]
+; Column 1 : default bondtype
+; Column 2 : default angletype
+; Column 3 : default proper dihedraltype
+; Column 4 : default improper dihedraltype
+; Column 5 : This controls the generation of dihedrals from the bonding.
+;            All possible dihedrals are generated automatically. A value of
+;            1 here means that all these are retained. A value of
+;            0 here requires generated dihedrals be removed if
+;              * there are any dihedrals on the same central atoms
+;                specified in the residue topology, or
+;              * there are other identical generated dihedrals
+;                sharing the same central atoms, or
+;              * there are other generated dihedrals sharing the
+;                same central bond that have fewer hydrogen atoms
+; Column 6 : number of neighbors to exclude from non-bonded interactions
+; Column 7 : 1 = generate 1,4 interactions between pairs of hydrogen atoms
+;            0 = do not generate such
+; Column 8 : 1 = remove proper dihedrals if found centered on the same
+;                bond as an improper dihedral
+;            0 = do not generate such
+; bonds  angles  dihedrals  impropers all_dihedrals nrexcl HH14 RemoveDih
+     1       1          3          1        1         3      1     0
+
+[ ACE ]
+ [ atoms ]
+   CH3    opls_135   -0.180     1
+  HH31    opls_140    0.060     1
+  HH32    opls_140    0.060     1
+  HH33    opls_140    0.060     1
+     C    opls_235    0.500     2
+     O    opls_236   -0.500     2
+ [ bonds ]
+   CH3  HH31
+   CH3  HH32
+   CH3  HH33
+   CH3     C
+     C     O
+[ impropers ]
+  CH3    +N    C      O     improper_O_C_X_Y 
+
+[ ALA ]
+ [ atoms ] 
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1 
+    CA    opls_224B   0.140     1 
+    HA    opls_140    0.060     1 
+    CB    opls_135   -0.180     2 
+   HB1    opls_140    0.060     2 
+   HB2    opls_140    0.060     2 
+   HB3    opls_140    0.060     2 
+     C    opls_235    0.500     3
+     O    opls_236   -0.500     3
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB   HB3
+     C     O
+    -C     N
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+
+[ AIB ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1 
+    CA    opls_225B   0.200     1 
+   CB1    opls_135   -0.180     2 
+  HB11    opls_140    0.060     2 
+  HB12    opls_140    0.060     2 
+  HB13    opls_140    0.060     2 
+   CB2    opls_135   -0.180     3 
+  HB21    opls_140    0.060     3 
+  HB22    opls_140    0.060     3 
+  HB23    opls_140    0.060     3 
+     C    opls_235    0.500     4
+     O    opls_236   -0.500     4
+ [ bonds ]
+     N     H
+     N    CA
+    CA   CB1
+    CA   CB2
+    CA     C
+   CB1  HB11
+   CB1  HB12
+   CB1  HB13
+   CB2  HB21
+   CB2  HB22
+   CB2  HB23
+     C     O
+    -C     N
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y
+    CA    +N     C     O    improper_O_C_X_Y
+
+
+[ ARG ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_308   -0.050     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_307    0.190     4
+   HD1    opls_140    0.060     4
+   HD2    opls_140    0.060     4
+    NE    opls_303   -0.700     5
+    HE    opls_304    0.440     5
+    CZ    opls_302    0.640     5
+   NH1    opls_300   -0.800     6
+  HH11    opls_301    0.460     6
+  HH12    opls_301    0.460     6
+   NH2    opls_300   -0.800     7
+  HH21    opls_301    0.460     7
+  HH22    opls_301    0.460     7
+     C    opls_235    0.500     8
+     O    opls_236   -0.500     8
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   HG1
+    CG   HG2
+    CG    CD
+    CD   HD1
+    CD   HD2
+    CD    NE
+    NE    HE
+    NE    CZ
+    CZ   NH1
+    CZ   NH2
+   NH1  HH11
+   NH1  HH12
+   NH2  HH21
+   NH2  HH22
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_ARG_chi1_N_C_C_C
+    CG    CB    CA     C    dih_ARG_chi1_C_C_C_CO
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+    CD    CZ    NE    HE    improper_Z_N_X_Y 
+    NE   NH1    CZ   NH2    improper_O_C_X_Y  
+    CZ  HH11   NH1  HH12    improper_Z_N_X_Y  
+    CZ  HH21   NH2  HH22    improper_Z_N_X_Y  
+
+[ ARGN ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_308   -0.050     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_748    0.040     4
+   HD1    opls_140    0.060     4
+   HD2    opls_140    0.060     4
+    NE    opls_749   -0.620     5
+    HE    opls_304    0.350     5; guessed charge
+    CZ    opls_752    0.550     6
+   NH1    opls_750   -0.785     6
+   HH1    opls_301    0.340     6; guessed charge
+   NH2    opls_751   -0.785     7
+  HH21    opls_301    0.360     7; guessed charge
+  HH22    opls_301    0.360     7; guessed charge
+     C    opls_235    0.500     8
+     O    opls_236   -0.500     8
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   HG1
+    CG   HG2
+    CG    CD
+    CD   HD1
+    CD   HD2
+    CD    NE
+    NE    HE
+    NE    CZ
+    CZ   NH1
+    CZ   NH2
+   NH1   HH1
+   NH2  HH21
+   NH2  HH22
+     C     O
+    -C     N
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+    CD    CZ    NE    HE    improper_Z_N_X_Y 
+    NE   NH1    CZ   NH2    improper_O_C_X_Y 
+    CZ  HH21   NH2  HH22    improper_Z_N_X_Y 
+
+
+[ ASN ]
+ [ atoms ]
+     N    opls_238   -0.500     0
+     H    opls_241    0.300     0
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_235    0.500     3
+   OD1    opls_236   -0.500     3
+   ND2    opls_237   -0.760     4
+  HD21    opls_240    0.380     4
+  HD22    opls_240    0.380     4
+     C    opls_235    0.500     5
+     O    opls_236   -0.500     5
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   OD1
+    CG   ND2
+   ND2  HD21
+   ND2  HD22
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG     dih_ASN_chi1_N_C_C_C
+    CG    CB    CA     C     dih_ASN_chi1_C_C_C_CO
+    CA    CB    CG   ND2     dih_ASN_chi2_C_C_CO_N
+ [ impropers ]
+    -C    CA     N     H     improper_Z_N_X_Y 
+    CA    +N     C     O     improper_O_C_X_Y 
+    CB   ND2    CG   OD1     improper_O_C_X_Y   
+    CG  HD21   ND2  HD22     improper_Z_N_X_Y   
+
+[ ASP ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_274   -0.220     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_271    0.700     3
+   OD1    opls_272   -0.800     3
+   OD2    opls_272   -0.800     3
+     C    opls_235    0.500     4
+     O    opls_236   -0.500     4
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   OD1
+    CG   OD2
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_ASP_chi1_N_C_C_C
+    CG    CB    CA     C    dih_ASP_chi1_C_C_C_CO
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y
+    CA    +N     C     O    improper_O_C_X_Y
+    CB   OD1    CG   OD2    improper_O_C_X_Y
+
+[ ASPH ]
+ [ atoms ]
+     N    opls_238   -0.500     0
+     H    opls_241    0.300     0
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_267    0.520     3
+   OD1    opls_269   -0.440     3
+   OD2    opls_268   -0.530     4
+   HD2    opls_270    0.450     4
+     C    opls_235    0.500     5
+     O    opls_236   -0.500     5
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   OD1
+    CG   OD2
+   OD2   HD2
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_ASP_chi1_N_C_C_C
+    CG    CB    CA     C    dih_ASP_chi1_C_C_C_CO
+    CB    CG   OD2   HD2    dih_sidechain_COOH_C_C_O_H
+   OD1    CG   OD2   HD2    dih_sidechain_COOH_O_C_O_H
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+    CB   OD1    CG   OD2    improper_O_C_X_Y     
+
+
+[ CYS2 ] ; aka CYX
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_214    0.0975    2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    SG    opls_203   -0.2175    2
+     C    opls_235    0.500     3
+     O    opls_236   -0.500     3
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    SG
+     C     O
+    -C     N
+ [ dihedrals ] ; override some of the typebased dihedrals
+     N    CA    CB    SG    dih_CYS_chi1_N_C_C_S
+     C    CA    CB    SG    dih_CYS_chi1_CO_C_C_S
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+[ CYSH ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_206    0.060     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    SG    opls_200   -0.335     3
+    HG    opls_204    0.155     3
+     C    opls_235    0.500     4
+     O    opls_236   -0.500     4
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    SG
+    SG    HG
+     C     O
+    -C     N
+ [ dihedrals ] ; override some of the typebased dihedrals
+     N    CA    CB    SG    dih_CYS_chi1_N_C_C_S
+     C    CA    CB    SG    dih_CYS_chi1_CO_C_C_S
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+[ GLN ]
+ [ atoms ]
+     N    opls_238   -0.500     0
+     H    opls_241    0.300     0
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_136   -0.120     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_235    0.500     4
+   OE1    opls_236   -0.500     4
+   NE2    opls_237   -0.760     5
+  HE21    opls_240    0.380     5
+  HE22    opls_240    0.380     5
+     C    opls_235    0.500     6
+     O    opls_236   -0.500     6
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   HG1
+    CG   HG2
+    CG    CD
+    CD   OE1
+    CD   NE2
+   NE2  HE21
+   NE2  HE22
+     C     O
+    -C     N
+ [ dihedrals ] ; override some of the typebased dihedrals
+     N    CA    CB    CG    dih_GLN_chi1_N_C_C_C
+    CG    CB    CA     C    dih_GLN_chi1_C_C_C_CO
+    CB    CG    CD   NE2    dih_GLN_chi3_C_C_CO_N
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+    CG   NE2    CD   OE1    improper_O_C_X_Y  
+    CD  HE21   NE2  HE22    improper_Z_N_X_Y        
+
+
+[ GLU ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_274   -0.220     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_271    0.700     4
+   OE1    opls_272   -0.800     4
+   OE2    opls_272   -0.800     4
+     C    opls_235    0.500     5
+     O    opls_236   -0.500     5
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   HG1
+    CG   HG2
+    CG    CD
+    CD   OE1
+    CD   OE2
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_GLU_chi1_N_C_C_C
+    CG    CB    CA     C    dih_GLU_chi1_C_C_C_CO
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+    CG   OE1    CD   OE2    improper_O_C_X_Y   
+
+
+[ PGLU ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_274   -0.120     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_235    0.500     4
+    OE    opls_236   -0.500     4
+     C    opls_235    0.500     5
+     O    opls_236   -0.500     5
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   HG1
+    CG   HG2
+    CG    CD
+    CD    OE
+    CD     N
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_GLU_chi1_N_C_C_C
+    CG    CB    CA     C    dih_GLU_chi1_C_C_C_CO
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+;    CG   OE1    CD   OE2    improper_O_C_X_Y   
+
+
+[ GLUH ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_136   -0.120     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_267    0.520     4
+   OE1    opls_269   -0.440     4
+   OE2    opls_268   -0.530     5
+   HE2    opls_270    0.450     5
+     C    opls_235    0.500     6
+     O    opls_236   -0.500     6
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   HG1
+    CG   HG2
+    CG    CD
+    CD   OE1
+    CD   OE2
+   OE2   HE2
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_GLU_chi1_N_C_C_C
+    CG    CB    CA     C    dih_GLU_chi1_C_C_C_CO
+    CG    CD   OE2   HE2    dih_sidechain_COOH_C_C_O_H
+   OE1    CD   OE2   HE2    dih_sidechain_COOH_O_C_O_H
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+    CG   OE1    CD   OE2    improper_O_C_X_Y   
+
+
+[ GLY ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_223B   0.080     1
+   HA1    opls_140    0.060     1
+   HA2    opls_140    0.060     1
+     C    opls_235    0.500     2
+     O    opls_236   -0.500     2
+ [ bonds ]
+     N     H
+     N    CA
+    CA   HA1
+    CA   HA2
+    CA     C
+     C     O
+    -C     N
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+
+[ HISD ] 
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_505   -0.005     2 
+   HB1    opls_140    0.060     2 
+   HB2    opls_140    0.060     2 
+    CG    opls_508    0.015     3
+   ND1    opls_503   -0.570     4
+   HD1    opls_504    0.420     4
+   CD2    opls_507   -0.015     5
+   HD2    opls_146    0.115     5
+   CE1    opls_506    0.295     6
+   HE1    opls_146    0.115     6
+   NE2    opls_511   -0.490     7
+     C    opls_235    0.500     8
+     O    opls_236   -0.500     8
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   ND1
+    CG   CD2
+   ND1   HD1
+   ND1   CE1
+   CD2   HD2
+   CD2   NE2
+   CE1   HE1
+   CE1   NE2
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_HIS_chi1_N_C_C_C
+    CG    CB    CA     C    dih_HIS_chi1_C_C_C_CO
+    CA    CB    CG   ND1    dih_HIS_chi2_C_C_C_N
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y
+    CA    +N     C     O    improper_O_C_X_Y
+   ND1   CD2    CG    CB    improper_Z_CA_X_Y
+    CG   CE1   ND1   HD1    improper_Z_N_X_Y
+    CG   NE2   CD2   HD2    improper_Z_CA_X_Y
+   ND1   NE2   CE1   HE1    improper_Z_CA_X_Y
+
+
+[ HISE ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_505   -0.005     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_507   -0.015     3
+   ND1    opls_511   -0.490     3
+   CD2    opls_508    0.015     4
+   HD2    opls_146    0.115     4
+   CE1    opls_506    0.295     5
+   HE1    opls_146    0.115     5
+   NE2    opls_503   -0.570     6
+   HE2    opls_504    0.420     6
+     C    opls_235    0.500     7
+     O    opls_236   -0.500     7
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   ND1
+    CG   CD2
+   ND1   CE1
+   CD2   HD2
+   CD2   NE2
+   CE1   HE1
+   CE1   NE2
+   NE2   HE2
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_HIS_chi1_N_C_C_C
+    CG    CB    CA     C    dih_HIS_chi1_C_C_C_CO
+    CA    CB    CG   ND1    dih_HIS_chi2_C_C_C_N
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y  
+    CA    +N     C     O    improper_O_C_X_Y  
+   CE1   CD2   NE2   HE2    improper_Z_N_X_Y  
+    CG   NE2   CD2   HD2    improper_Z_CA_X_Y 
+   ND1   NE2   CE1   HE1    improper_Z_CA_X_Y        
+   ND1   CD2   CG     CB    improper_Z_CA_X_Y     
+
+
+[ HISH ]  ; also known as HISP (or HIS+)
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_505   -0.005     2 
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_510    0.215     3 
+   ND1    opls_512   -0.540     4
+   HD1    opls_513    0.460     4 
+   CD2    opls_510    0.215     5 
+   HD2    opls_146    0.115     5 
+   CE1    opls_509    0.385     6 
+   HE1    opls_146    0.115     6 
+   NE2    opls_512   -0.540     7 
+   HE2    opls_513    0.460     7 
+     C    opls_235    0.500     8
+     O    opls_236   -0.500     8
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   ND1
+    CG   CD2
+   ND1   HD1
+   ND1   CE1
+   CD2   HD2
+   CD2   NE2
+   CE1   HE1
+   CE1   NE2
+   NE2   HE2
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_HIP_chi1_N_C_C_C
+    CG    CB    CA     C    dih_HIP_chi1_C_C_C_CO
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y  
+    CA    +N     C     O    improper_O_C_X_Y  
+    CG   CE1   ND1   HD1    improper_Z_N_X_Y       
+   CE1   CD2   NE2   HE2    improper_Z_N_X_Y  
+    CG   NE2   CD2   HD2    improper_Z_CA_X_Y 
+   ND1   NE2   CE1   HE1    improper_Z_CA_X_Y 
+   ND1   CD2    CG    CB    improper_Z_CA_X_Y     
+
+
+[ HOH ] 
+; We believe SPC has slightly better properties than TIP3P...
+ [ atoms ]
+    OW   opls_116   -0.82      0
+   HW1   opls_117    0.41      0
+   HW2   opls_117    0.41      0
+ [ bonds ]
+    OW   HW1
+    OW   HW2
+
+[ HO4 ] 
+; TIP4P
+ [ atoms ]
+    OW   opls_113    0.00      0
+   HW1   opls_114    0.52      0
+   HW2   opls_114    0.52      0
+    MW   opls_115   -1.04      0
+ [ bonds ]
+    OW   HW1
+    OW   HW2
+
+[ HO5 ] 
+; TIP5P
+ [ atoms ]
+    OW   opls_118    0.00      0
+   HW1   opls_119    0.248     0
+   HW2   opls_119    0.248     0
+   LP1   opls_120   -0.248     0
+   LP2   opls_120   -0.248     0
+ [ bonds ]
+    OW   HW1
+    OW   HW2
+
+[ ILE ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_137   -0.060     2
+    HB    opls_140    0.060     2
+   CG1    opls_136   -0.120     3
+  HG11    opls_140    0.060     3
+  HG12    opls_140    0.060     3
+   CG2    opls_135   -0.180     4
+  HG21    opls_140    0.060     4
+  HG22    opls_140    0.060     4
+  HG23    opls_140    0.060     4
+    CD    opls_135   -0.180     5
+   HD1    opls_140    0.060     5
+   HD2    opls_140    0.060     5
+   HD3    opls_140    0.060     5
+     C    opls_235    0.500     6
+     O    opls_236   -0.500     6
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB    HB
+    CB   CG1
+    CB   CG2
+   CG1  HG11
+   CG1  HG12
+   CG1    CD
+   CG2  HG21
+   CG2  HG22
+   CG2  HG23
+    CD   HD1
+    CD   HD2
+    CD   HD3
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB   CG1    dih_ILE_chi1_N_C_C_C
+     N    CA    CB   CG2    dih_ILE_chi1_N_C_C_C
+   CG1    CB    CA     C    dih_ILE_chi1_C_C_C_CO
+   CG2    CB    CA     C    dih_ILE_chi1_C_C_C_CO
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+[ LEU ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_137   -0.060     3
+    HG    opls_140    0.060     3
+   CD1    opls_135   -0.180     4
+  HD11    opls_140    0.060     4
+  HD12    opls_140    0.060     4
+  HD13    opls_140    0.060     4
+   CD2    opls_135   -0.180     5
+  HD21    opls_140    0.060     5
+  HD22    opls_140    0.060     5
+  HD23    opls_140    0.060     5
+     C    opls_235    0.500     6
+     O    opls_236   -0.500     6
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG    HG
+    CG   CD1
+    CG   CD2
+   CD1  HD11
+   CD1  HD12
+   CD1  HD13
+   CD2  HD21
+   CD2  HD22
+   CD2  HD23
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_LEU_chi1_N_C_C_C
+    CG    CB    CA     C    dih_LEU_chi1_C_C_C_CO
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+[ LYS ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_136   -0.120     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_136   -0.120     4
+   HD1    opls_140    0.060     4
+   HD2    opls_140    0.060     4
+    CE    opls_906    0.060     5
+   HE1    opls_911    0.060     5
+   HE2    opls_911    0.060     5
+    NZ    opls_900   -0.900     6 
+   HZ1    opls_909    0.360     6 
+   HZ2    opls_909    0.360     6 
+     C    opls_235    0.500     7
+     O    opls_236   -0.500     7
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   HG1
+    CG   HG2
+    CG    CD
+    CD   HD1
+    CD   HD2
+    CD    CE
+    CE   HE1
+    CE   HE2
+    CE    NZ
+    NZ   HZ1
+    NZ   HZ2
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_LYS_chi1_N_C_C_C
+    CG    CB    CA     C    dih_LYS_chi1_C_C_C_CO
+    CD    CE    NZ   HZ1    dih_LYS_chi5_C_C_N_H
+    CD    CE    NZ   HZ2    dih_LYS_chi5_C_C_N_H
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+
+[ LYSH ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_136   -0.120     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_136   -0.120     4
+   HD1    opls_140    0.060     4
+   HD2    opls_140    0.060     4
+    CE    opls_292    0.190     5
+   HE1    opls_140    0.060     5
+   HE2    opls_140    0.060     5
+    NZ    opls_287   -0.300     6
+   HZ1    opls_290    0.330     6
+   HZ2    opls_290    0.330     6
+   HZ3    opls_290    0.330     6
+     C    opls_235    0.500     7
+     O    opls_236   -0.500     7
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   HG1
+    CG   HG2
+    CG    CD
+    CD   HD1
+    CD   HD2
+    CD    CE
+    CE   HE1
+    CE   HE2
+    CE    NZ
+    NZ   HZ1
+    NZ   HZ2
+    NZ   HZ3
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_LYS_chi1_N_C_C_C
+    CG    CB    CA     C    dih_LYS_chi1_C_C_C_CO
+    CD    CE    NZ   HZ1    dih_LYS_chi5_C_C_N_H
+    CD    CE    NZ   HZ2    dih_LYS_chi5_C_C_N_H
+    CD    CE    NZ   HZ3    dih_LYS_chi5_C_C_N_H
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+
+[ MET ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_210    0.048     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    SD    opls_202   -0.335     4
+    CE    opls_209   -0.013     5
+   HE1    opls_140    0.060     5
+   HE2    opls_140    0.060     5
+   HE3    opls_140    0.060     5
+     C    opls_235    0.500     6
+     O    opls_236   -0.500     6
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   HG1
+    CG   HG2
+    CG    SD
+    SD    CE
+    CE   HE1
+    CE   HE2
+    CE   HE3
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_MET_chi1_N_C_C_C
+    CG    CB    CA     C    dih_MET_chi1_C_C_C_CO
+  [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+
+[ NAC ] ; metylamide, a.k.a NMA.
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+   CH3    opls_242    0.020     2
+  HH31    opls_140    0.060     2
+  HH32    opls_140    0.060     2
+  HH33    opls_140    0.060     2
+ [ bonds ]
+     N     H
+     N   CH3
+   CH3  HH31
+   CH3  HH32
+   CH3  HH33
+    -C     N
+ [ impropers ]
+    -C    CH3     N    H      improper_Z_N_X_Y
+
+
+[ NH2 ]
+ [ atoms ]
+     N     opls_237  -0.760     1
+    H1     opls_240   0.380     1
+    H2     opls_240   0.380     1
+ [ bonds ]
+    -C     N
+     N     H1
+     N     H2
+ [ impropers ]
+    -C     H1    N      H2       improper_Z_N_X_Y
+
+[ NHE ]
+; same as NH2
+ [ atoms ]
+     N     opls_237  -0.760     1
+    H1     opls_240   0.380     1
+    H2     opls_240   0.380     1
+ [ bonds ]
+    -C     N
+     N     H1
+     N     H2
+ [ impropers ]
+    -C     H1     N     H2       improper_Z_N_X_Y
+
+[ PHE ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_149   -0.005     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_145   -0.115     2
+   CD1    opls_145   -0.115     3
+   HD1    opls_146    0.115     3
+   CD2    opls_145   -0.115     4
+   HD2    opls_146    0.115     4
+   CE1    opls_145   -0.115     5
+   HE1    opls_146    0.115     5
+   CE2    opls_145   -0.115     6
+   HE2    opls_146    0.115     6 
+    CZ    opls_145   -0.115     7 
+    HZ    opls_146    0.115     7
+     C    opls_235    0.500     8
+     O    opls_236   -0.500     8
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   CD1
+    CG   CD2
+   CD1   HD1
+   CD1   CE1
+   CD2   HD2
+   CD2   CE2
+   CE1   HE1
+   CE1    CZ
+   CE2   HE2
+   CE2    CZ
+    CZ    HZ
+     C     O
+    -C     N
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y  
+    CA    +N     C     O    improper_O_C_X_Y  
+    CG   CE2   CD2   HD2    improper_Z_CA_X_Y 
+   CD2    CZ   CE2   HE2    improper_Z_CA_X_Y 
+   CE1   CE2    CZ    HZ    improper_Z_CA_X_Y 
+   CD1    CZ   CE1   HE1    improper_Z_CA_X_Y 
+    CG   CE1   CD1   HD1    improper_Z_CA_X_Y 
+   CD1   CD2    CG    CB    improper_Z_CA_X_Y     
+
+
+[ PRO ]
+ [ atoms ]
+     N    opls_239   -0.140     1
+    CA    opls_246    0.010     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_136   -0.120     3
+   HG1    opls_140    0.060     3
+   HG2    opls_140    0.060     3
+    CD    opls_245   -0.050     4
+   HD1    opls_140    0.060     4
+   HD2    opls_140    0.060     4
+     C    opls_235    0.500     5
+     O    opls_236   -0.500     5
+ [ bonds ]
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   HG1
+    CG   HG2
+    CG    CD
+    CD   HD1
+    CD   HD2
+    CD     N
+     C     O
+    -C     N
+ [ impropers ]
+    -C    CA     N    CD    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+     
+
+[ SER ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_157    0.145     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    OG    opls_154   -0.683     3
+    HG    opls_155    0.418     3
+     C    opls_235    0.500     4
+     O    opls_236   -0.500     4
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    OG
+    OG    HG
+     C     O
+    -C     N
+ [ dihedrals ] ; override some of the typebased dihedrals
+     N    CA    CB    OG    dih_SER_THR_chi1_N_C_C_O
+     C    CA    CB    OG    dih_SER_THR_chi1_CO_C_C_O
+    CA    CB    OG    HG    dih_SER_THR_chi2_C_C_OH_HO
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+
+[ THR ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_158    0.205     2
+    HB    opls_140    0.060     2
+   OG1    opls_154   -0.683     2
+   HG1    opls_155    0.418     2
+   CG2    opls_135   -0.180     3
+  HG21    opls_140    0.060     3
+  HG22    opls_140    0.060     3
+  HG23    opls_140    0.060     3
+     C    opls_235    0.500     4
+     O    opls_236   -0.500     4
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB    HB
+    CB   OG1
+    CB   CG2
+   OG1   HG1
+   CG2  HG21
+   CG2  HG22
+   CG2  HG23
+     C     O
+    -C     N
+ [ dihedrals ] ; override some of the typebased dihedrals
+     N    CA    CB   OG1    dih_SER_THR_chi1_N_C_C_O
+     C    CA    CB   OG1    dih_SER_THR_chi1_CO_C_C_O
+    CA    CB   OG1   HG1    dih_SER_THR_chi2_C_C_OH_HO
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+  
+[ TRP ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_136   -0.120     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_500    0.075     3  
+   CD1    opls_514   -0.115     4 
+   HD1    opls_146    0.115     4  
+   CD2    opls_501   -0.055     5
+   NE1    opls_503   -0.570     6  
+   HE1    opls_504    0.420     6  
+   CE2    opls_502    0.130     6
+   CE3    opls_145   -0.115     7  
+   HE3    opls_146    0.115     7  
+   CZ2    opls_145   -0.115     8  
+   HZ2    opls_146    0.115     8   
+   CZ3    opls_145   -0.115     9  
+   HZ3    opls_146    0.115     9  
+   CH2    opls_145   -0.115     10  
+   HH2    opls_146    0.115     10 
+     C    opls_235    0.500     11
+     O    opls_236   -0.500     11
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   CD1
+    CG   CD2
+   CD1   HD1
+   CD1   NE1
+   CD2   CE2
+   CD2   CE3
+   NE1   HE1
+   NE1   CE2
+   CE2   CZ2
+   CE3   HE3
+   CE3   CZ3
+   CZ2   HZ2
+   CZ2   CH2
+   CZ3   HZ3
+   CZ3   CH2
+   CH2   HH2
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+     N    CA    CB    CG    dih_TRP_chi1_N_C_C_C
+    CG    CB    CA     C    dih_TRP_chi1_C_C_C_CO
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y  
+    CA    +N     C     O    improper_O_C_X_Y  
+   CD1   CE2   NE1   HE1    improper_Z_N_X_Y   
+   CE2   CH2   CZ2   HZ2    improper_Z_CA_X_Y 
+   CZ2   CZ3   CH2   HH2    improper_Z_CA_X_Y 
+   CH2   CE3   CZ3   HZ3    improper_Z_CA_X_Y 
+   CZ3   CD2   CE3   HE3    improper_Z_CA_X_Y 
+    CG   NE1   CD1   HD1    improper_Z_CA_X_Y 
+   CD1   CD2    CG    CB    improper_Z_CA_X_Y   
+
+
+[ TYR ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_149   -0.005     2
+   HB1    opls_140    0.060     2
+   HB2    opls_140    0.060     2
+    CG    opls_145   -0.115     2
+   CD1    opls_145   -0.115     4
+   HD1    opls_146    0.115     4
+   CD2    opls_145   -0.115     5
+   HD2    opls_146    0.115     5
+   CE1    opls_145   -0.115     6
+   HE1    opls_146    0.115     6
+   CE2    opls_145   -0.115     7
+   HE2    opls_146    0.115     7
+    CZ    opls_166    0.150     8
+    OH    opls_167   -0.585     8
+    HH    opls_168    0.435     8
+     C    opls_235    0.500     9
+     O    opls_236   -0.500     9
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB   HB1
+    CB   HB2
+    CB    CG
+    CG   CD1
+    CG   CD2
+   CD1   HD1
+   CD1   CE1
+   CD2   HD2
+   CD2   CE2
+   CE1   HE1
+   CE1    CZ
+   CE2   HE2
+   CE2    CZ
+    CZ    OH
+    OH    HH
+     C     O
+    -C     N
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y
+    CA    +N     C     O    improper_O_C_X_Y
+    CG   CE2   CD2   HD2    improper_Z_CA_X_Y
+   CD2    CZ   CE2   HE2    improper_Z_CA_X_Y
+   CD1    CZ   CE1   HE1    improper_Z_CA_X_Y
+    CG   CE1   CD1   HD1    improper_Z_CA_X_Y
+   CD1   CD2    CG    CB    improper_Z_CA_X_Y
+   CE1   CE2    CZ    OH    improper_Z_CA_X_Y
+
+
+[ VAL ]
+ [ atoms ]
+     N    opls_238   -0.500     1
+     H    opls_241    0.300     1
+    CA    opls_224B   0.140     1
+    HA    opls_140    0.060     1
+    CB    opls_137   -0.060     2
+    HB    opls_140    0.060     2
+   CG1    opls_135   -0.180     3
+  HG11    opls_140    0.060     3
+  HG12    opls_140    0.060     3
+  HG13    opls_140    0.060     3
+   CG2    opls_135   -0.180     4
+  HG21    opls_140    0.060     4
+  HG22    opls_140    0.060     4
+  HG23    opls_140    0.060     4
+     C    opls_235    0.500     5
+     O    opls_236   -0.500     5
+ [ bonds ]
+     N     H
+     N    CA
+    CA    HA
+    CA    CB
+    CA     C
+    CB    HB
+    CB   CG1
+    CB   CG2
+   CG1  HG11
+   CG1  HG12
+   CG1  HG13
+   CG2  HG21
+   CG2  HG22
+   CG2  HG23
+     C     O
+    -C     N
+ [ dihedrals ] ; override some with residue-specific ones
+    N    CA    CB    CG1    dih_VAL_chi1_N_C_C_C
+    N    CA    CB    CG2    dih_VAL_chi1_N_C_C_C
+   CG1    CB    CA     C    dih_VAL_chi1_C_C_C_CO
+   CG2    CB    CA     C    dih_VAL_chi1_C_C_C_CO
+ [ impropers ]
+    -C    CA     N     H    improper_Z_N_X_Y 
+    CA    +N     C     O    improper_O_C_X_Y 
+
+
+[ F ]
+ [ atoms ]
+    F    opls_400  -1.000     0
+
+[ CL ]
+ [ atoms ]
+    CL   opls_401  -1.000     0
+
+[ BR ]
+ [ atoms ]
+    BR   opls_402  -1.000     0
+
+
+; Aqvists cation parameters
+
+[ LI ]
+ [ atoms ]
+    LI   opls_406   1.000     0 ; Jorgensen ion type would be opls_404
+
+[ NA ]
+ [ atoms ]
+    NA   opls_407   1.000     0 ; Jorgensen ion type would be opls_405
+
+[ K ]
+ [ atoms ]
+    K    opls_408   1.000     0
+
+[ RB ]
+ [ atoms ]
+    RB   opls_409   1.000     0
+
+[ CS ]
+ [ atoms ]
+    CS   opls_410   1.000     0
+
+[ MG ]
+ [ atoms ]
+    MG   opls_411   2.000     0
+
+[ CA ]
+ [ atoms ]
+    CA   opls_412   2.000     0
+
+[ SR ]
+ [ atoms ]
+    SR   opls_413   2.000     0
+
+[ BA ]
+ [ atoms ]
+    BA   opls_414   2.000     0
+
+
+; Ethanol - CA is the carbon bound to the OH group
+[ EtOH ]
+ [ atoms ]
+    CB   opls_135    -0.180    1
+   HB1   opls_140     0.060    1
+   HB2   opls_140     0.060    1
+   HB3   opls_140     0.060    1
+    CA   opls_157     0.145    2
+   HA1   opls_140     0.060    2
+   HA2   opls_140     0.060    2
+    OH   opls_154    -0.683    2
+    HO   opls_155     0.418    2
+ [ bonds ]
+   CB    HB1
+   CB    HB2
+   CB    HB3
+   CB    CA
+   CA    HA1
+   CA    HA2
+   CA    OH
+   OH    HO
+
+
+; New All atom DMSO model, DvdS, 17/06/2006
+; Use at your own risk!
+[ DMSO  ]
+ [ atoms ]
+OD      opls_125    -0.459      1
+SD      opls_124     0.139      1
+CD1     opls_139    -0.020      1
+HD11    opls_140     0.060      1
+HD12    opls_140     0.060      1
+HD13    opls_140     0.060      1
+CD2     opls_139    -0.020      1
+HD21    opls_140     0.060      1
+HD22    opls_140     0.060      1
+HD23    opls_140     0.060      1
+
+ [ bonds ]
+    OD     SD
+    SD     CD1
+    SD     CD2
+    CD1    HD11
+    CD1    HD12
+    CD1    HD13
+    CD2    HD21
+    CD2    HD22
+    CD2    HD23    
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[ BS ] ; Benzenselphonet.rtp file code for a new residue named "BS"
+; Atomic partial charges used to model the benzenesulfonate taken from Langmuir 2017, 33, 18, 4461–4476 .
+  [ atoms ]
+; atom    type    	   charge   
+     S        opls_493       +0.852    1   ; S (CHelpG)
+     O1       opls_494       -0.590    1   ; O (CHelpG)
+     O2       opls_494       -0.590    1   ; O (CHelpG)
+     O3       opls_494       -0.590    1   ; O (CHelpG)
+     C1       opls_499       -0.082    1   ; C (CHelpG)
+     C2       opls_145       -0.115    2   ; C
+     H2       opls_146       +0.115    2   ; H
+     C3       opls_145       -0.115    3   ; C
+     H3       opls_146       +0.115    3   ; H
+     C4       opls_145       -0.115    4   ; C
+     H4       opls_146       +0.115    4   ; H
+     C5       opls_145       -0.115    5   ; C
+     H5       opls_146       +0.115    5   ; H
+     C6       opls_145       -0.115    6   ; C
+     H6       opls_146       +0.115    6   ; H
+ [ bonds ]  
+;  atom1    atom2      b0      kb	 
+     S      O1
+     S      O2
+     S      O3
+     S      C1
+    C1      C2
+    C2      H2
+    C2      C3        
+    C3      H3 
+    C3      C4
+    C4      H4
+    C4      C5
+    C5      H5
+    C5      C6    
+    C6      H6
+    C1      C6
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[ TMBS ] ; tetrametyle benzenselphonet.rtp file code for a new residue named "TMBS"
+; Atomic partial charges used to model the tetra metyle benzenesulfonate is taken from Langmuir 2017, 33, 18, 4461–4476 .
+  [ atoms ]
+; atom    type    	   charge   
+     S        opls_493       +0.852    1   ; S (CHelpG)
+     O1       opls_494       -0.590    1   ; O (CHelpG)
+     O2       opls_494       -0.590    1   ; O (CHelpG)
+     O3       opls_494       -0.590    1   ; O (CHelpG)
+     C1       opls_499       -0.082    1   ; C (CHelpG)
+     C2       opls_145       -0.115    2   ; C
+     C21      opls_148       -0.065    2   ; C (attached to benzen)
+     H21      opls_140       +0.06     2   ; H
+     H22      opls_140       +0.06     2   ; H
+     H23      opls_140       +0.06     2   ; H
+     C3       opls_145       -0.115    3   ; C
+     H3       opls_146       +0.115    3   ; H
+     C4       opls_145       -0.115    4   ; C
+     C41      opls_148       -0.065    4   ; C  (attached to benzen)
+     H41      opls_140       +0.06     4   ; H
+     H42      opls_140       +0.06     4   ; H
+     H43      opls_140       +0.06     4   ; H
+     C5       opls_145       -0.115    5   ; C
+     H5       opls_146       +0.115    5   ; H
+     C6       opls_145       -0.115    6   ; C
+     C61      opls_148       -0.065    6   ; C  (attached to benzen)
+     H61      opls_140       +0.06     6   ; H
+     H62      opls_140       +0.06     6   ; H
+     H63      opls_140       +0.06     6   ; H
+ [ bonds ]  
+;  atom1    atom2      b0      kb	 
+     S      O1
+     S      O2
+     S      O3
+     S      C1
+    C1      C2
+    C2      C21
+    C21     H21
+    C21     H22
+    C21     H23
+    C2      C3        
+    C3      H3 
+    C3      C4
+    C4      C41
+    C41     H41
+    C41     H42
+    C41     H43
+    C4      C5
+    C5      H5
+    C5      C6    
+    C6      C61
+    C61     H61
+    C61     H62
+    C61     H63
+    C1      C6  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ [ TBS ] ; tetrametyle benzenselphonet.rtp file code for a new residue named "TBS"
+; Atomic partial charges used to model the tetra metyle benzenesulfonate is taken from DFT calculation with B3LYP .
+  [ atoms ]
+; atom    type    	   charge   
+     S        opls_493       +0.649274    1   ; S (CHelpG)
+     O1       opls_494       -0.505993    1   ; O (CHelpG)
+     O2       opls_494       -0.505993    1   ; O (CHelpG)
+     O3       opls_494       -0.505993    1   ; O (CHelpG)
+     C1       opls_499        0.035532    1   ; C (CHelpG)
+     C2       opls_145        0.036943    2   ; C (Aromatic)
+     C21      opls_148       -0.096053    2   ; C (Attached to benzen)
+     H21      opls_140        0.034685    2   ; H (CH_n)
+     H22      opls_140        0.034685    2   ; H (CH_n)
+     H23      opls_140        0.034685    2   ; H (CH_n)
+     C3       opls_145       -0.267665    3   ; C (Aromatic)
+     H3       opls_146        0.094835    3   ; H (Aromatic) 
+     C4       opls_145        0.106582    4   ; C (Aromatic)
+     C41      opls_148       -0.089921    4   ; C (Attached to benzen)
+     H41      opls_140        0.024095    4   ; H (CH_n) 
+     H42      opls_140        0.024095    4   ; H (CH_n)
+     H43      opls_140        0.024095    4   ; H (CH_n)
+     C5       opls_145       -0.267665    5   ; C (Aromatic)
+     H5       opls_146        0.094835    5   ; H (Aromatic)
+     C6       opls_145        0.036943    6   ; C (Aromatic)
+     C61      opls_148       -0.09605     6   ; C (Attached to benzen)
+     H61      opls_140        0.034685    6   ; H (CH_n)
+     H62      opls_140        0.034685    6   ; H (CH_n)
+     H63      opls_140        0.034685    6   ; H (CH_n)
+ [ bonds ]  
+;  atom1    atom2      b0      kb	 
+     S      O1
+     S      O2
+     S      O3
+     S      C1
+    C1      C2
+    C2      C21
+    C21     H21
+    C21     H22
+    C21     H23
+    C2      C3        
+    C3      H3 
+    C3      C4
+    C4      C41
+    C41     H41
+    C41     H42
+    C41     H43
+    C4      C5
+    C5      H5
+    C5      C6    
+    C6      C61
+    C61     H61
+    C61     H62
+    C61     H63
+    C1      C6
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[DMBS ] ; 4,6 metyle benzenselphonet.rtp file code for a new residue named "DMBS"
+; Atomic partial charges used to model the tetra metyle benzenesulfonate is taken from https://doi.org/10.1038/s42004-019-0151-2 .
+  [ atoms ]
+; atom    type    	   charge   
+     S        opls_493       +1.7739    1   ; S 
+     O1       opls_494       -0.7678    1   ; O 
+     O2       opls_494       -0.7678    1   ; O 
+     O3       opls_494       -0.7614    1   ; O 
+     C1       opls_499       -0.2524    1   ; C   
+     C2       opls_145       -0.0965    2   ; C 
+     H2       opls_140       +0.2413    2   ; H
+     C3       opls_145       -0.2208    3   ; C 
+     H3       opls_146       +0.2223    3   ; H 
+     C4       opls_145       +0.1156    4   ; C 
+     C41      opls_148       -0.5670    4   ; C 
+     H41      opls_140       +0.2456    4   ; H 
+     H42      opls_140       +0.2456    4   ; H 
+     H43      opls_140       +0.2429    4   ; H 
+     C5       opls_145       -0.2728    5   ; C 
+     H5       opls_146       +0.2235    5   ; H 
+     C6       opls_145       +0.1381    6   ; C 
+     C61      opls_148       -0.5439    6   ; C 
+     H61      opls_140       +0.2789    6   ; H 
+     H62      opls_140       +0.2789    6   ; H 
+     H63      opls_140       +0.2437    6   ; H  
+ [ bonds ]  
+;  atom1    atom2      b0      kb	 
+     S      O1
+     S      O2
+     S      O3
+     S      C1
+    C1      C2
+    C2      C3        
+    C3      H3 
+    C3      C4
+    C4      C41
+    C41     H41
+    C41     H42
+    C41     H43
+    C4      C5
+    C5      H5
+    C5      C6
+    C6      C61
+    C61     H61
+    C61     H62
+    C61     H63        
+    
+[ DPS ] ; .rtp file code for a new residue named "DPS"
+; Atomic partial charges used to model the 
+  [ atoms ]
+; atom    type    	   charge 
+  S1    opls_493            1.402156   1
+  O11   opls_494           -0.752721   1
+  O12   opls_494           -0.752721   1
+  O13   opls_494           -0.752721   1 
+  C1    opls_499           -0.469073   1
+  H11   opls_140            0.162540   1      ; for 3 H each had 0.108360 charges obtained from RESP
+  H12   opls_140            0.162540   1
+  C2    opls_136           -0.243351   2
+  H21   opls_140            0.163620   2     ; 0.109080  for 3 Hydrogen
+  H22   opls_140            0.163620   2
+  C3    opls_136            0.013575   2
+  H31   opls_140            0.106732   2
+  H32   opls_140            0.106732   2
+  N1    opls_103           -0.015968   2
+  C4    opls_135           -0.370162   2
+  H41   opls_140            0.189073   2
+  H42   opls_140            0.189073   2 
+  H43   opls_140            0.189073   2
+  C5    opls_135           -0.370162   2
+  H51   opls_140            0.189073   2
+  H52   opls_140            0.189073   2
+  H53   opls_140            0.189073   2
+  C6    opls_136            0.013575   2 
+  H61   opls_140            0.106732   2
+  H62   opls_140            0.106732   2
+  C7    opls_136           -0.243351   2 
+  H71   opls_140            0.163620   2    ; 0.109080  for 3 Hydrogen
+  H72   opls_140            0.163620   2
+  C8    opls_136           -0.120000   3     ; oplsaa
+  H81   opls_140            0.060000   3 
+  H82   opls_140            0.060000   3
+  C9    opls_280            0.470000   4     ; ketone
+  O91   opls_281           -0.470000   4    ; ketone
+  C10   opls_139            0.000000   5    ; C-alpha
+  C11   opls_135           -0.180000   5    ;oplsaa 
+  H91   opls_140            0.060000   5 
+  H92   opls_140            0.060000   5
+  H93   opls_140            0.060000   5
+  C12   opls_135           -0.180000   5 
+  H25   opls_140            0.060000   5
+  H26   opls_140            0.060000   5
+  H27   opls_140            0.060000   5
+  C13   opls_135           -0.180000   5
+  H35   opls_140            0.060000   5
+  H36   opls_140            0.060000   5
+  H37   opls_140            0.060000   5
+ [ bonds ]  
+;  atom1    atom2      b0      kb
+  S1    O11
+  S1    O12
+  S1    O13
+  S1    C1
+  C1    H11
+  C1    H12
+  C1    C2
+  C2    H21
+  C2    H22
+  C2    C3
+  C3    H31
+  C3    H32
+  C3    N1
+  N1    C4
+  C4    H41
+  C4    H42
+  C4    H43
+  N1    C5
+  C5    H51
+  C5    H52
+  C5    H53
+  N1    C6
+  C6    H61
+  C6    H62
+  C6    C7
+  C7    H71
+  C7    H72
+  C7    C8
+  C8    H81
+  C8    H82
+  C8    C9
+  C9    O91
+  C9    C10
+  C10   C11
+  C11   H91
+  C11   H92
+  C11   H93
+  C10   C12
+  C12   H25
+  C12   H26
+  C12   H27
+  C10   C13
+  C13   H35
+  C13   H36
+  C13   H37    
+
+[ DMA ] ; DMAPS.rtp file code for a new residue named "DMAPS"
+; Atomic partial charges used to model the  3-[Dimethyl-[2-(2-methylprop-2-enoyloxy)ethyl]azaniumyl]propane-1-sulfonate zwitterionic.
+  [ atoms ]
+; atom    type    	   charge 
+  S1    opls_493            1.402156   1
+  O11   opls_494           -0.752721   1
+  O12   opls_494           -0.752721   1
+  O13   opls_494           -0.752721   1 
+  C1    opls_499           -0.469073   1
+  H11   opls_140            0.162540   1      ; for 3 H each had 0.108360 charges obtained from RESP
+  H12   opls_140            0.162540   1
+  C2    opls_136           -0.243351   2
+  H21   opls_140            0.163620   2     ; 0.109080  for 3 Hydrogen
+  H22   opls_140            0.163620   2
+  C3    opls_136            0.013575   2
+  H31   opls_140            0.106732   2
+  H32   opls_140            0.106732   2
+  N1    opls_103           -0.015968   2
+  C4    opls_135           -0.370162   2
+  H41   opls_140            0.189073   2
+  H42   opls_140            0.189073   2 
+  H43   opls_140            0.189073   2
+  C5    opls_135           -0.370162   2
+  H51   opls_140            0.189073   2
+  H52   opls_140            0.189073   2
+  H53   opls_140            0.189073   2
+  C6    opls_136            0.013575   2 
+  H61   opls_140            0.106732   2
+  H62   opls_140            0.106732   2
+  C7    opls_136           -0.243351   2 
+  H71   opls_140            0.163620   2    ; 0.109080  for 3 Hydrogen
+  H72   opls_140            0.163620   2
+  C8    opls_136           -0.120000   3     ; oplsaa
+  H81   opls_140            0.060000   3 
+  H82   opls_140            0.060000   3
+  C9    opls_280            0.470000   4     ; ketone
+  O91   opls_281           -0.470000   4    ; ketone
+  C10   opls_139            0.000000   5    ; C-alpha
+  C11   opls_135           -0.180000   5    ;oplsaa 
+  H91   opls_140            0.060000   5 
+  H92   opls_140            0.060000   5
+  H93   opls_140            0.060000   5
+  C12   opls_135           -0.120000   5 
+  H25   opls_140            0.060000   5
+  H26   opls_140            0.060000   5
+
+  [ bonds ]  
+;  atom1    atom2      b0      kb
+  S1    O11
+  S1    O12
+  S1    O13
+  S1    C1
+  C1    H11
+  C1    H12
+  C1    C2
+  C2    H21
+  C2    H22
+  C2    C3
+  C3    H31
+  C3    H32
+  C3    N1
+  N1    C4
+  C4    H41
+  C4    H42
+  C4    H43
+  N1    C5
+  C5    H51
+  C5    H52
+  C5    H53
+  N1    C6
+  C6    H61
+  C6    H62
+  C6    C7
+  C7    H71
+  C7    H72
+  C7    C8
+  C8    H81
+  C8    H82
+  C8    C9
+  C9    O91
+  C9    C10
+  C10   C11
+  C11   H91
+  C11   H92
+  C11   H93
+  C10   C12
+  C12   H25
+  C12   H26
+
+[ MMA ] ; MMA.rtp file code for a new residue named "MMA"
+; Atomic partial charges used to model the Methyle metacrylate is taken from Gulia
+  [ atoms ]
+; atom    type             charge
+;
+  C1      opls_136        0.160  1   ;                       
+  H11     opls_185        0.030  1
+  H12     opls_185        0.030  1
+  H13     opls_185        0.030  1
+  O21     opls_179       -0.330  1
+  C2      opls_280        0.510  1
+  O22     opls_281       -0.430  1
+  C3      opls_139        0.000  2
+  C4      opls_135       -0.135  2 
+  H41     opls_140        0.045  2 
+  H42     opls_140        0.045  2
+  H43     opls_140        0.045  2
+  C5      opls_136       -0.090  3        
+  H51     opls_140        0.045  3
+  H52     opls_140        0.045  3
+
+  [ bonds ]
+;  atom1    atom2      b0      kb
+   C1      H11
+   C1      H12
+   C1      H13
+   C1      O21
+   O21     C2
+   C2      O22
+   C2      C3
+   C3      C4
+   C4      H41
+   C4      H42
+   C4      H43
+   C3      C5
+   C5      H51
+   C5      H52
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  PMMA  ;;;;;;;;;;;;;;;;;;;
+
+[ MMF ] ; First residue of PMMA
+; Atomic partial charges used to model the Methyle metacrylate are taken from  10.1021/ma0610562
+  [ atoms ]
+; atom    type    	   charge   
+  CE      opls_490        0.160  1   ;   C(H2OS) ethyl ester
+  HE1     opls_469        0.030  1   ;   methoxy Hs in esters
+  HE2     opls_469        0.030  1   ;   methoxy Hs in esters
+  HE3     opls_469        0.030  1   ;   methoxy Hs in esters
+  OD1     opls_467       -0.330  1   ;   AA -OR: ester
+  CD      opls_465        0.510  1   ;   AA C:   esters
+  OD2     opls_466       -0.430  1   ;   AA =O:  esters 
+  CC      opls_139        0.000  2   ;   alkane C              
+  CB      opls_135       -0.180  2   ;   alkane CH3
+  HB1     opls_140        0.060  2   ;   alkane H
+  HB2     opls_140        0.060  2   ;   alkane H
+  HB3     opls_140        0.060  2   ;   alkane H
+  CA      opls_135       -0.180  3   ;   alkane CH3   
+  HA1     opls_140        0.060  3   ;   alkane H
+  HA2     opls_140        0.060  3   ;   alkane H
+  HA3     opls_140        0.060  3   ;   alkane H	
+  [ bonds ]
+; atom1   atom2      b0      kb
+   CE      HE1
+   CE      HE2
+   CE      HE3
+   CE      OD1
+   OD1     CD
+   CD      OD2
+   CD      CC
+   CC      CB
+   CB      HB1
+   CB      HB2
+   CB      HB3
+   CA      CC 
+   CA      HA1
+   CA      HA2
+   CA      HA3
+   CC     +CA
+
+
+[ MMR ] ; Repeating residue of PMMA
+; Atomic partial charges used to model the Methyle metacrylate are taken from  10.1021/ma0610562
+  [ atoms ]
+; atom    type    	   charge   
+  CE      opls_490        0.160  1   ;   C(H2OS) ethyl ester
+  HE1     opls_469        0.030  1   ;   methoxy Hs in esters
+  HE2     opls_469        0.030  1   ;   methoxy Hs in esters
+  HE3     opls_469        0.030  1   ;   methoxy Hs in esters
+  OD1     opls_467       -0.330  1   ;   AA -OR: ester
+  CD      opls_465        0.510  1   ;   AA C:   esters
+  OD2     opls_466       -0.430  1   ;   AA =O:  esters 
+  CC      opls_139        0.000  2   ;   alkane C              
+  CB      opls_135       -0.180  2   ;   alkane CH3
+  HB1     opls_140        0.060  2   ;   alkane H
+  HB2     opls_140        0.060  2   ;   alkane H
+  HB3     opls_140        0.060  2   ;   alkane H
+  CA      opls_136       -0.120  3   ;   alkane CH2   
+  HA1     opls_140        0.060  3   ;   alkane H
+  HA2     opls_140        0.060  3   ;   alkane H 
+[ bonds ]
+; atom1   atom2      b0      kb
+   CE      HE1
+   CE      HE2
+   CE      HE3
+   CE      OD1
+   OD1     CD
+   CD      OD2
+   CD      CC
+   CC      CB
+   CB      HB1
+   CB      HB2
+   CB      HB3
+   CA      CC 
+   CA      HA1
+   CA      HA2
+   CA     -CC
+   CC     +CA
+
+
+[ MMLu ] ; Last residue of PMMA
+; Atomic partial charges used to model the Methyle metacrylate is taken from  10.1021/ma0610562
+  [ atoms ]
+; atom    type    	   charge   
+  CE      opls_490        0.160  1   ;   C(H2OS) ethyl ester
+  HE1     opls_469        0.030  1   ;   methoxy Hs in esters
+  HE2     opls_469        0.030  1   ;   methoxy Hs in esters
+  HE3     opls_469        0.030  1   ;   methoxy Hs in esters
+  OD1     opls_467       -0.330  1   ;   AA -OR: ester
+  CD      opls_465        0.510  1   ;   AA C:   esters
+  OD2     opls_466       -0.430  1   ;   AA =O:  esters 
+  CC      opls_139        0.000  2   ;   alkane C              
+  CB      opls_135       -0.180  2   ;   alkane CH3
+  HB1     opls_140        0.060  2   ;   alkane H
+  HB2     opls_140        0.060  2   ;   alkane H
+  HB3     opls_140        0.060  2   ;   alkane H
+  CF      opls_135       -0.180  3   ;   alkane CH3
+  HF1     opls_140        0.060  3   ;   alkane H
+  HF2     opls_140        0.060  3   ;   alkane H
+  HF3     opls_140        0.060  3   ;   alkane H	
+  CA      opls_136       -0.120  4   ;   alkane CH2   
+  HA1     opls_140        0.060  4   ;   alkane H
+  HA2     opls_140        0.060  4   ;   alkane H
+[ bonds ]
+; atom1   atom2      b0      kb
+   CE      HE1
+   CE      HE2
+   CE      HE3
+   CE      OD1
+   OD1     CD
+   CD      OD2
+   CD      CC
+   CC      CB
+   CB      HB1
+   CB      HB2
+   CB      HB3
+   CC      CF
+   CF      HF1
+   CF      HF2
+   CF      HF3 
+   CA      CC 
+   CA      HA1
+   CA      HA2
+   CA     -CC   
+;---------------------------------------------------
+[ DMFo ]
+ [ atoms ]
+  CAP1   opls_135   -0.1800         1     
+  CC     opls_139   0.0000          2      
+  CB     opls_135   -0.1800         2      
+  CD     opls_465   0.2170          3      
+  OD2    opls_466   -0.2918         3      
+  OD1    opls_467   -0.2421         3      
+  CE     opls_490   0.1939          3      
+  C6     opls_136   -0.4018         4      
+  N1     opls_103   0.1573          4      
+  C4     opls_135   -0.4018         4      
+  C5     opls_135   -0.4018         4      
+  CL1    opls_136   -0.197662       4     
+  CL2    opls_136   -0.12000        5       
+  CL3    opls_136   -0.469073       6        
+  S1     opls_493    1.4022         6       
+  O1     opls_494   -0.7527         6      
+  O2     opls_494   -0.7527         6      
+  O3     opls_494   -0.7527         6    
+  BCH2   opls_135   -0.120          7      
+  H1     opls_140    0.0600         1   
+  H2     opls_140    0.0600         1   
+  H3     opls_140    0.0600         1   
+  H4     opls_140    0.06000        2    
+  H5     opls_140    0.06000        2   
+  H6     opls_140    0.06000        2   
+  H7     opls_140    0.061541       3   
+  H8     opls_140    0.061541       3   
+  H9     opls_140    0.204171       4    
+  H10    opls_140    0.204171       4  
+  H11    opls_140    0.204171       4 
+  H12    opls_140    0.204171       4 
+  H13    opls_140    0.204171       4  
+  H14    opls_140    0.204171       4 
+  H15    opls_140    0.204171       4 
+  H16    opls_140    0.204171       4 
+  H17    opls_140    0.204171       4 
+  H18    opls_140    0.204171       4 
+  H19    opls_140    0.060000       5  
+  H20    opls_140    0.060000       5 
+  H21    opls_140    0.162540       6  
+  H22    opls_140    0.162540       6 
+  H23    opls_140    0.060000       7  
+  H24    opls_140    0.060000       7     
+
+[ bonds ]
+  CAP1    CC
+  CAP1    H1
+  CAP1    H2
+  CAP1    H3
+  CC      CB
+  CC      CD
+  CC      BCH2
+  CB      H4
+  CB      H5
+  CB      H6
+  CD      OD1
+  CD      OD2
+  OD1     CE
+  CE      C6
+  CE      H7
+  CE      H8
+  C6      N1
+  C6      H9
+  C6      H10
+  N1      C4
+  N1      C5
+  N1      CL1
+  C4      H11
+  C4      H12
+  C4      H13
+  C5      H14
+  C5      H15
+  C5      H16
+  CL1     CL2
+  CL1     H17
+  CL1     H18
+  CL2     CL3
+  CL2     H19
+  CL2     H20
+  CL3     S1
+  CL3     H21
+  CL3     H22
+  S1      O1
+  S1      O2
+  S1      O3
+  BCH2    H23
+  BCH2    H24
+  BCH2    +CC
+
+[ DMR0 ]
+ [ atoms ]
+  CC     opls_139   0.0000        1      
+  CB     opls_135   -0.1800       1  
+  CD     opls_465   0.2170        2 
+  OD2    opls_466   -0.2918       2 
+  OD1    opls_467   -0.2421       2 
+  CE     opls_490   0.1939        2 
+  C6     opls_136   -0.4018       3
+  N1     opls_103   0.1573        3
+  C4     opls_135   -0.4018       3
+  C5     opls_135   -0.4018       3
+  CL1    opls_136   -0.197662     3
+  CL2    opls_136   -0.12000      4 
+  CL3    opls_136   -0.469073     5 
+  S1     opls_493   1.4022        5 
+  O1     opls_494   -0.7527       5 
+  O2     opls_494   -0.7527       5  
+  O3     opls_494   -0.7527       5  
+  BCH2   opls_135   -0.1200       6
+  H1     opls_140   0.06000       1  
+  H2     opls_140   0.06000       1  
+  H3     opls_140   0.06000       1 
+  H4     opls_140   0.061541      2  
+  H5     opls_140   0.061541      2 
+  H6     opls_140   0.204171      2 
+  H7     opls_140   0.204171      2 
+  H8     opls_140   0.204171      2   
+  H9     opls_140   0.204171      2  
+  H10    opls_140   0.204171      2  
+  H11    opls_140   0.204171      2  
+  H12    opls_140   0.204171      2  
+  H13    opls_140   0.204171      2  
+  H14    opls_140   0.204171      2  
+  H15    opls_140   0.204171      2 
+  H16    opls_140   0.06000       4 
+  H17    opls_140   0.06000       3  
+  H18    opls_140   0.162540      5 
+  H19    opls_140   0.162540      5 
+  H20    opls_140   0.06000       6
+  H21    opls_140   0.06000       6
+
+[ bonds ]
+  CC      -BCH2
+  CC      CB
+  CC      CD
+  CC      BCH2
+  CB      H1
+  CB      H2
+  CB      H3
+  CD      OD1
+  CD      OD2
+  OD1     CE
+  CE      C6
+  CE      H4
+  CE      H5
+  C6      N1
+  C6      H6
+  C6      H7
+  N1      C4
+  N1      C5
+  N1      CL1
+  C4      H8
+  C4      H9
+  C4      H10
+  C5      H11
+  C5      H12
+  C5      H13
+  CL1     CL2
+  CL1     H14
+  CL1     H15
+  CL2     CL3
+  CL2     H16
+  CL2     H17
+  CL3     S1
+  CL3     H18
+  CL3     H19
+  S1      O1
+  S1      O2
+  S1      O3
+  BCH2    H20
+  BCH2    H21
+  BCH2    +CC
+
+[ DML00 ]
+ [ atoms ]
+  CC     opls_139   0.0000        1   
+  CB     opls_135   -0.1800       1     
+  CD     opls_465   0.2170        2    
+  OD2    opls_466   -0.2918       2    
+  OD1    opls_467   -0.2421       2    
+  CE     opls_490   0.1939        2    
+  C6     opls_136   -0.4018       3
+  N1     opls_103   0.1573        3
+  C4     opls_135   -0.4018       3
+  C5     opls_135   -0.4018       3
+  CL1    opls_136   -0.197662     3
+  CL2    opls_136   -0.1200       4  
+  CL3    opls_136   -0.469073     5  
+  S1     opls_493    1.4022       5    
+  O1     opls_494   -0.7527       5  
+  O2     opls_494   -0.7527       5      
+  O3     opls_494   -0.7527       5  
+  CAP2   opls_135   -0.120        6
+  H1     opls_140   0.0600        1 
+  H2     opls_140   0.0600        1 
+  H3     opls_140   0.0600        1  
+  H4     opls_140   0.204171      2  
+  H5     opls_140   0.204171      2  
+  H6     opls_140   0.204171      3
+  H7     opls_140   0.204171      3
+  H8     opls_140   0.204171      3
+  H9     opls_140   0.204171      3
+  H10    opls_140   0.204171      3
+  H11    opls_140   0.204171      3
+  H12    opls_140   0.204171      3
+  H13    opls_140   0.204171      3
+  H14    opls_140   0.204171      3
+  H15    opls_140   0.204171      3
+  H16    opls_140   0.06000       4   
+  H17    opls_140   0.06000       4   
+  H18    opls_140   0.162540      5 
+  H19    opls_140   0.162540      5 
+  H20    opls_140   0.06000       6
+  H21    opls_140   0.06000       6
+  H22    opls_140   0.06000       6
+
+
+ [ bonds ]
+  CC      -BCH2
+  CC      CB
+  CC      CD
+  CC      CAP2
+  CB      H1
+  CB      H2
+  CB      H3
+  CD      OD1
+  CD      OD2
+  OD1     CE
+  CE      C6
+  CE      H4
+  CE      H5
+  C6      N1
+  C6      H6
+  C6      H7
+  N1      C4
+  N1      C5
+  N1      CL1
+  C4      H8
+  C4      H9
+  C4      H10
+  C5      H11
+  C5      H12
+  C5      H13
+  CL1     CL2
+  CL1     H14
+  CL1     H15
+  CL2     CL3
+  CL2     H16
+  CL2     H17
+  CL3     S1
+  CL3     H18
+  CL3     H19
+  S1      O1
+  S1      O2
+  S1      O3
+  CAP2    H20
+  CAP2    H21
+  CAP2    H22
+
+
+;================================MMA/DMAPS===========
+[ MCF00 ]
+ [ atoms ]
+  CAP1   opls_135   -0.1800     1
+  H1     opls_140    0.0600     1
+  H2     opls_140    0.0600     1
+  H3     opls_140    0.0600     1
+  CC     opls_139    0.0000     1
+  BCH2   opls_135   -0.1200     1
+  H10    opls_140    0.06000    1
+  H11    opls_140    0.06000    1
+  CB     opls_135   -0.1800     2
+  H4     opls_140    0.06000    2
+  H5     opls_140    0.06000    2
+  H6     opls_140    0.06000    2
+  CD     opls_465    0.2170     3
+  OD2    opls_466   -0.2918     3
+  OD1    opls_467   -0.2421     3
+  CE     opls_490    0.1324     3
+  H7     opls_140    0.061541   3
+  H8     opls_140    0.061541   3
+  H9     opls_140    0.061541   3
+ [ bonds ]
+  CAP1   H1
+  CAP1   H2
+  CAP1   H3
+  CAP1   CC
+  CC     CB
+  CC     CD
+  CC     BCH2
+  CB     H4
+  CB     H5
+  CB     H6
+  CD     OD2
+  CD     OD1
+  OD1    CE
+  CE     H7
+  CE     H8
+  CE     H9
+  BCH2   H10
+  BCH2   H11
+  BCH2    +CC
+
+[ MCR00 ]
+ [ atoms ]
+  CC     opls_139    0.0000     1
+  BCH2   opls_135   -0.1200     1
+  H7     opls_140    0.06000    1
+  H8     opls_140    0.06000    1
+  CB     opls_135   -0.1800     2
+  H1     opls_140    0.06000    2
+  H2     opls_140    0.06000    2
+  H3     opls_140    0.06000    2
+  CD     opls_465    0.2170     3
+  OD2    opls_466   -0.2918     3
+  OD1    opls_467   -0.2421     3
+  CE     opls_490    0.1324     3
+  H4     opls_140    0.061541   3
+  H5     opls_140    0.061541   3
+  H6     opls_140    0.061541   3
+ [ bonds ]
+  CC     CB
+  CC     CD
+  CC     BCH2
+  CB     H1
+  CB     H2
+  CB     H3
+  CD     OD2
+  CD     OD1
+  OD1    CE
+  CE     H4
+  CE     H5
+  CE     H6
+  BCH2   H7
+  BCH2   H8
+  CC      -BCH2
+  BCH2    +CC
+
+[ DMR00 ]   ; Repeated Zwitterion
+ [ atoms ]
+  CC     opls_139   0.0000        1
+  CB     opls_135   -0.1800       1
+  H1     opls_140   0.06000       1
+  H2     opls_140   0.06000       1
+  H3     opls_140   0.06000       1
+  CD     opls_465   0.2170        2
+  OD2    opls_466   -0.2918       2
+  OD1    opls_467   -0.2421       2
+  CE     opls_490   0.1939        2
+  H4     opls_140   0.061541      2
+  H5     opls_140   0.061541      2
+  C6     opls_136  -0.197629      3
+  N1     opls_103   0.1573        3
+  C4     opls_135   -0.4018       3
+  C5     opls_135   -0.4018       3
+  CL1    opls_136   -0.197629     3
+  H6     opls_140   0.204171      3
+  H7     opls_140   0.204171      3
+  H8     opls_140   0.204171      3
+  H9     opls_140   0.204171      3
+  H10    opls_140   0.204171      3
+  H11    opls_140   0.204171      3
+  H12    opls_140   0.204171      3
+  H13    opls_140   0.204171      3
+  H14    opls_140   0.204171      3
+  H15    opls_140   0.204171      3
+  CL2    opls_136   -0.12000      4
+  H16    opls_140   0.06000       4
+  H17    opls_140   0.06000       4
+  CL3    opls_136   -0.469073     5
+  S1     opls_493   1.4022        5
+  O1     opls_494   -0.7527       5
+  O2     opls_494   -0.7527       5
+  O3     opls_494   -0.7527       5
+  H18    opls_140   0.162540      5
+  H19    opls_140   0.162540      5
+  BCH2   opls_135   -0.1200       6
+  H20    opls_140   0.06000       6
+  H21    opls_140   0.06000       6
+
+[ bonds ]
+  CC      -BCH2
+  CC      CB
+  CC      CD
+  CC      BCH2
+  CB      H1
+  CB      H2
+  CB      H3
+  CD      OD1
+  CD      OD2
+  OD1     CE
+  CE      C6
+  CE      H4
+  CE      H5
+  C6      N1
+  C6      H6
+  C6      H7
+  N1      C4
+  N1      C5
+  N1      CL1
+  C4      H8
+  C4      H9
+  C4      H10
+  C5      H11
+  C5      H12
+  C5      H13
+  CL1     CL2
+  CL1     H14
+  CL1     H15
+  CL2     CL3
+  CL2     H16
+  CL2     H17
+  CL3     S1         0.18100   185769.6 ;  CT    S   1  0.18100 185769.6 ; CYX(OL)
+  CL3     H18       
+  CL3     H19
+  S1      O1         0.14577   443504 ;
+  S1      O2         0.14577   443504 ;
+  S1      O3         0.14577   443504 ;
+  BCH2    H20
+  BCH2    H21
+  BCH2    +CC
+[angles]
+CL2     CL3    S1  114.700    418.400   ; CYX            SCHERAGA  JPC 79,1428
+CL3     S1     O1  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+CL3     S1     O2  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+CL3     S1     O3  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+H18     CL3    S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+H19     CL3    S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+O1      S1     O2   113.83    418.40  
+O1      S1     O3   113.83    418.40
+O2      S1     O3   113.83    418.40
+
+[ MCL00 ]
+ [ atoms ]
+  CC     opls_139   0.0000     1
+  CAP2   opls_135   -0.1800    1
+  H7     opls_140   0.06000    1
+  H8     opls_140   0.06000    1
+  H9     opls_140   0.06000    1
+  CB     opls_135   -0.1800    2
+  H1     opls_140   0.06000    2
+  H2     opls_140   0.06000    2
+  H3     opls_140   0.06000    2
+  CD     opls_465   0.2170     3
+  OD2    opls_466   -0.2918    3
+  OD1    opls_467   -0.2421    3
+  CE     opls_490   0.1324     3
+  H4     opls_140   0.061541   3
+  H5     opls_140   0.061541   3
+  H6     opls_140   0.061541   3
+
+ [ bonds ]
+  CC     CAP2
+  CAP2   H7
+  CAP2   H8
+  CAP2   H9
+  CC     CB
+  CB     H1
+  CB     H2
+  CB     H3
+  CC     CD
+  CD     OD2
+  CD     OD1
+  OD1    CE
+  CE     H4
+  CE     H5
+  CE     H6
+  CC    -BCH2
+  
+ ;---------------------Zwitterionic Polymers for FO----------------------------
+  
+; =========== Methyle metacrylate monomer ===========
+[ MCF ]
+ [ atoms ]
+  CAP1   opls_135  -0.1800   1
+  H1     opls_140   0.0600   1
+  H2     opls_140   0.0600   1
+  H3     opls_140   0.0600   1
+  CC     opls_139   0.0000   1
+  BCH2   opls_135  -0.1200   1
+  H10    opls_140   0.0600   1
+  H11    opls_140   0.0600   1
+  CB     opls_135  -0.1800   2
+  H4     opls_140   0.0600   2
+  H5     opls_140   0.0600   2
+  H6     opls_140   0.0600   2
+  CD     opls_465   0.2170   3
+  OD2    opls_466  -0.2918   3
+  OD1    opls_467  -0.2421   3
+  CE     opls_490   0.1324   3
+  H7     opls_140   0.0615   3
+  H8     opls_140   0.0615   3
+  H9     opls_140   0.0615   3
+ [ bonds ]
+  CAP1   H1
+  CAP1   H2
+  CAP1   H3
+  CAP1   CC
+  CB     CC
+  CC     CD
+  BCH2   CC
+  CB     H4
+  CB     H5
+  CB     H6
+  CD     OD2
+  CD     OD1
+  CE     OD1
+  CE     H7
+  CE     H8
+  CE     H9
+  BCH2   H10
+  BCH2   H11
+  BCH2    +CC
+
+[ MCR ]
+ [ atoms ]
+  CC     opls_139   0.0000   1
+  BCH2   opls_135  -0.1200   1
+  H7     opls_140   0.0600   1
+  H8     opls_140   0.0600   1
+  CB     opls_135  -0.1800  2
+  H1     opls_140   0.0600   2
+  H2     opls_140   0.0600   2
+  H3     opls_140   0.0600   2
+  CD     opls_465   0.2170   3
+  OD2    opls_466  -0.2918   3
+  OD1    opls_467  -0.2421   3
+  CE     opls_490   0.1324   3
+  H4     opls_140   0.0615   3
+  H5     opls_140   0.0615   3
+  H6     opls_140   0.0615   3
+ [ bonds ]
+  CB     CC
+  CC     CD
+  BCH2   CC
+  CB     H1
+  CB     H2
+  CB     H3
+  CD     OD2
+  CD     OD1
+  CE     OD1
+  CE     H4
+  CE     H5
+  CE     H6
+  BCH2   H7
+  BCH2   H8
+  CC      -BCH2
+  BCH2    +CC
+
+[ MCL ]
+ [ atoms ]
+  CC     opls_139   0.0000   1
+  CAP2   opls_135  -0.1800   1
+  H7     opls_140   0.0600   1
+  H8     opls_140   0.0600   1
+  H9     opls_140   0.0600   1
+  CB     opls_135  -0.1800   2
+  H1     opls_140   0.0600   2
+  H2     opls_140   0.0600   2
+  H3     opls_140   0.0600   2
+  CD     opls_465   0.2170   3
+  OD2    opls_466  -0.2918   3
+  OD1    opls_467  -0.2421   3
+  CE     opls_490   0.1324   3
+  H4     opls_140   0.0615   3
+  H5     opls_140   0.0615   3
+  H6     opls_140   0.0615   3
+ [ bonds ]
+  CB     CC
+  CC     CD
+  CAP2   CC
+  CB     H1
+  CB     H2
+  CB     H3
+  CD     OD2
+  CD     OD1
+  CE     OD1
+  CE     H4
+  CE     H5
+  CE     H6
+  CAP2   H7
+  CAP2   H8
+  CAP2   H9
+  CC      -BCH2
+;=========== 2-[(methacryloyloxy) ethyl] dimethyl-(3 sulfopropyl) ammonium hydroxide (DMAPS) ==========
+[ DMF ]
+ [ atoms ]
+  CAP1   opls_135  -0.1800   1
+  H1     opls_140   0.0600   1
+  H2     opls_140   0.0600   1
+  H3     opls_140   0.0600   1
+  CC     opls_139   0.0000   1
+  BCH2   opls_135  -0.1200   1
+  H23    opls_140   0.0600   1
+  H24    opls_140   0.0600   1
+  CB     opls_135  -0.1800   2
+  H4     opls_140   0.0600   2
+  H5     opls_140   0.0600   2
+  H6     opls_140   0.0600   2
+  CD     opls_465   0.2170   3
+  OD2    opls_466  -0.2918   3
+  OD1    opls_467  -0.2421   3
+  CE     opls_490   0.1934   3       ; qo = 0.1939-0.0615
+  H7     opls_140   0.0615   3
+  H8     opls_140   0.0615   3
+  C6     opls_136  -0.1976   4
+  N1     opls_103   0.1573   4
+  C4     opls_135  -0.4018   4
+  C5     opls_135  -0.4018   4
+  C1     opls_136  -0.1976   4
+  H9     opls_140   0.2042   4
+  H10    opls_140   0.2042   4
+  H11    opls_140   0.2042   4
+  H12    opls_140   0.2042   4
+  H13    opls_140   0.2042   4
+  H14    opls_140   0.2042   4
+  H15    opls_140   0.2042   4
+  H16    opls_140   0.2042   4
+  H17    opls_140   0.2042   4
+  H18    opls_140   0.2042   4
+  C2     opls_136  -0.1200   5
+  H19    opls_140   0.0600   5
+  H20    opls_140   0.0600   5
+  C3     opls_136  -0.4691   6
+  S1     opls_493   1.4022   6
+  O1     opls_494  -0.7527   6
+  O2     opls_494  -0.7527   6
+  O3     opls_494  -0.7527   6
+  H21    opls_140   0.1625   6
+  H22    opls_140   0.1625   6
+ [ bonds ]
+  CAP1   H1
+  CAP1   H2
+  CAP1   H3
+  CAP1   CC
+  CB     CC
+  CC     CD
+  BCH2   CC
+  CB     H4
+  CB     H5
+  CB     H6
+  CD     OD2
+  CD     OD1
+  CE     OD1
+  C6     CE
+  CE     H7
+  CE     H8
+  C6     N1
+  C6     H9
+  C6     H10
+  C4     N1
+  C5     N1
+  C1     N1
+  C4     H11
+  C4     H12
+  C4     H13
+  C5     H14
+  C5     H15
+  C5     H16
+  C1     C2
+  C1     H17
+  C1     H18
+  C2     C3
+  C2     H19
+  C2     H20
+  C3     S1          0.18100   185769.6 ;  CT    S   1  0.18100 185769.6 ; CYX(OL)
+  C3     H21
+  C3     H22
+  O1     S1           0.14577   443504 ;
+  O2     S1           0.14577   443504 ;
+  O3     S1           0.14577   443504 ;
+  BCH2   H23
+  BCH2   H24
+  BCH2    +CC
+[angles]
+C2     C3     S1  114.700    418.400   ; CYX            SCHERAGA  JPC 79,1428
+C3     S1     O1  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O2  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O3  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+H21    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+H22    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+O1     S1     O2   113.83    418.40  
+O1     S1     O3   113.83    418.40
+O2     S1     O3   113.83    418.40
+[ DMR ]
+ [ atoms ]
+  CC     opls_139   0.0000   1
+  BCH2   opls_135  -0.1200   1
+  H20    opls_140   0.0600   1
+  H21    opls_140   0.0600   1
+  CB     opls_135  -0.1800   2
+  H1     opls_140   0.0600   2
+  H2     opls_140   0.0600   2
+  H3     opls_140   0.0600   2
+  CD     opls_465   0.2170   3
+  OD2    opls_466  -0.2918   3
+  OD1    opls_467  -0.2421   3
+  CE     opls_490   0.1934   3       ; qo = 0.1939-0.0615
+  H4     opls_140   0.0615   3
+  H5     opls_140   0.0615   3
+  C6     opls_136  -0.1976   4
+  N1     opls_103   0.1573   4
+  C4     opls_135  -0.4018   4
+  C5     opls_135  -0.4018   4
+  C1     opls_136  -0.1976   4
+  H6     opls_140   0.2042   4
+  H7     opls_140   0.2042   4
+  H8     opls_140   0.2042   4
+  H9     opls_140   0.2042   4
+  H10    opls_140   0.2042   4
+  H11    opls_140   0.2042   4
+  H12    opls_140   0.2042   4
+  H13    opls_140   0.2042   4
+  H14    opls_140   0.2042   4
+  H15    opls_140   0.2042   4
+  C2     opls_136  -0.1200   5
+  H16    opls_140   0.0600   5
+  H17    opls_140   0.0600   5
+  C3     opls_136  -0.4691   6
+  S1     opls_493   1.4022   6
+  O1     opls_494  -0.7527   6
+  O2     opls_494  -0.7527   6
+  O3     opls_494  -0.7527   6
+  H18    opls_140   0.1625   6
+  H19    opls_140   0.1625   6
+ [ bonds ]
+  CB     CC
+  CC     CD
+  BCH2   CC
+  CB     H1
+  CB     H2
+  CB     H3
+  CD     OD2
+  CD     OD1
+  CE     OD1
+  C6     CE
+  CE     H4
+  CE     H5
+  C6     N1
+  C6     H6
+  C6     H7
+  C4     N1
+  C5     N1
+  C1     N1
+  C4     H8
+  C4     H9
+  C4     H10
+  C5     H11
+  C5     H12
+  C5     H13
+  C1     C2
+  C1     H14
+  C1     H15
+  C2     C3
+  C2     H16
+  C2     H17
+  C3     S1               0.18100   185769.6 ;  CT    S   1  0.18100 185769.6 ; CYX(OL)
+  C3     H18
+  C3     H19
+  O1     S1                0.14577   443504 ;
+  O2     S1                0.14577   443504 ;
+  O3     S1                0.14577   443504 ;
+  BCH2   H20
+  BCH2   H21
+  CC      -BCH2
+  BCH2    +CC
+
+[angles]
+C2     C3     S1  114.700    418.400   ; CYX            SCHERAGA  JPC 79,1428
+C3     S1     O1  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O2  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O3  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+H18    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+H19    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+O1     S1     O2   113.83    418.40 
+O1     S1     O3   113.83    418.40
+O2     S1     O3   113.83    418.40
+
+[ DML ]
+ [ atoms ]
+  CC     opls_139   0.0000   1
+  CAP2   opls_135  -0.1800   1
+  H20    opls_140   0.0600   1
+  H21    opls_140   0.0600   1
+  H22    opls_140   0.0600   1
+  CB     opls_135  -0.1800   2
+  H1     opls_140   0.0600   2
+  H2     opls_140   0.0600   2
+  H3     opls_140   0.0600   2
+  CD     opls_465   0.2170   3
+  OD2    opls_466  -0.2918   3
+  OD1    opls_467  -0.2421   3
+  CE     opls_490   0.1934   3     ; qo = 0.1939-0.0615
+  H4     opls_140   0.0615   3
+  H5     opls_140   0.0615   3
+  C6     opls_136  -0.1976   4
+  N1     opls_103   0.1573   4
+  C4     opls_135  -0.4018   4
+  C5     opls_135  -0.4018   4
+  C1     opls_136  -0.1976   4
+  H6     opls_140   0.2042   4
+  H7     opls_140   0.2042   4
+  H8     opls_140   0.2042   4
+  H9     opls_140   0.2042   4
+  H10    opls_140   0.2042   4
+  H11    opls_140   0.2042   4
+  H12    opls_140   0.2042   4
+  H13    opls_140   0.2042   4
+  H14    opls_140   0.2042   4
+  H15    opls_140   0.2042   4
+  C2     opls_136  -0.1200   5
+  H16    opls_140   0.0600   5
+  H17    opls_140   0.0600   5
+  C3     opls_136  -0.4691   6
+  S1     opls_493   1.4022   6
+  O1     opls_494  -0.7527   6
+  O2     opls_494  -0.7527   6
+  O3     opls_494  -0.7527   6
+  H18    opls_140   0.1625   6
+  H19    opls_140   0.1625   6
+ [ bonds ]
+  CB     CC
+  CC     CD
+  CAP2   CC
+  CB     H1
+  CB     H2
+  CB     H3
+  CD     OD2
+  CD     OD1
+  CE     OD1
+  C6     CE
+  CE     H4
+  CE     H5
+  C6     N1
+  C6     H6
+  C6     H7
+  C4     N1
+  C5     N1
+  C1     N1
+  C4     H8
+  C4     H9
+  C4     H10
+  C5     H11
+  C5     H12
+  C5     H13
+  C1     C2
+  C1     H14
+  C1     H15
+  C2     C3
+  C2     H16
+  C2     H17
+  C3     S1              0.18100   185769.6 ;  CT    S   1  0.18100 185769.6 ; CYX(OL)
+  C3     H18
+  C3     H19
+  O1     S1             0.14577   443504 ;
+  O2     S1             0.14577   443504 ;
+  O3     S1             0.14577   443504 ;
+  CAP2   H20
+  CAP2   H21
+  CAP2   H22
+  CC      -BCH2
+[angles]
+C2     C3     S1  114.700    418.400   ; CYX            SCHERAGA  JPC 79,1428
+C3     S1     O1  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O2  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O3  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+H18    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+H19    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+O1     S1     O2   113.83    418.40 
+O1     S1     O3   113.83    418.40
+O2     S1     O3   113.83    418.40
+;===========3-[(3-acrylamidopropyl) dimethylammonio] propane-1-sulfonate (A3361) =========
+[ AAF ]
+ [ atoms ]
+  CAP1   opls_135  -0.1800   1
+  H1     opls_140   0.0600   1
+  H2     opls_140   0.0600   1
+  H3     opls_140   0.0600   1
+  CC     opls_135   -0.600   1
+  BCH2   opls_135  -0.1200   1
+  H4     opls_140   0.6000   1
+  H24    opls_140   0.0600   1
+  H25    opls_140   0.0600   1
+  CD     opls_235   -0.0373  2
+  OD1    opls_236   -0.2673  2
+  N2     opls_238   -0.0431  2
+  C7     opls_136   0.0993   2
+  H5     opls_241   0.1781   2           ; original 0.1785
+  H6     opls_140   0.0349   2
+  H7     opls_140   0.0349   2
+  C8     opls_136  -0.1200   3
+  H8     opls_140   0.0600   3
+  H9     opls_140   0.0600   3
+  C9     opls_136   -0.1976  4
+  N1     opls_103   0.1573   4
+  C4     opls_135   -0.4018  4
+  C5     opls_135   -0.4018  4
+  C1     opls_136   -0.1976  4
+  H10    opls_140   0.2042   4
+  H11    opls_140   0.2042   4
+  H12    opls_140   0.2042   4
+  H13    opls_140   0.2042   4
+  H14    opls_140   0.2042   4
+  H15    opls_140   0.2042   4
+  H16    opls_140   0.2042   4
+  H17    opls_140   0.2042   4
+  H18    opls_140   0.2042   4
+  H19    opls_140   0.2042   4
+  C2     opls_136  -0.1200   5
+  H20    opls_140   0.0600   5
+  H21    opls_140   0.0600   5
+  C3     opls_136  -0.4691   6
+  S1     opls_493   1.4022   6
+  O1     opls_494  -0.7527   6
+  O2     opls_494  -0.7527   6
+  O3     opls_494  -0.7527   6
+  H22    opls_140   0.1625   6
+  H23    opls_140   0.1625   6
+ [ bonds ]
+  CAP1   H1
+  CAP1   H2
+  CAP1   H3
+  CAP1   CC
+  CC     CD
+  BCH2   CC
+  CC     H4
+  CD     OD1
+  CD     N2
+  C7     N2
+  H5     N2
+  C7     C8
+  C7     H6
+  C7     H7
+  C8     C9
+  C8     H8
+  C8     H9
+  C9     N1
+  C9     H10
+  C9     H11
+  C4     N1
+  C5     N1
+  C1     N1
+  C4     H12
+  C4     H13
+  C4     H14
+  C5     H15
+  C5     H16
+  C5     H17
+  C1     C2
+  C1     H18
+  C1     H19
+  C2     C3
+  C2     H20
+  C2     H21
+  C3     S1       0.18100   185769.6 ;  CT    S   1  0.18100 185769.6 ; CYX(OL)
+  C3     H22
+  C3     H23
+  O1     S1      0.14577   443504 ; 
+  O2     S1      0.14577   443504 ;
+  O3     S1      0.14577   443504 ;
+  BCH2   H24
+  BCH2   H25
+  BCH2    +CC
+[angles]
+C2     C3     S1  114.700    418.400   ; CYX            SCHERAGA  JPC 79,1428
+C3     S1     O1  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O2  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O3  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+H22    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+H23    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+O1     S1     O2   113.83    418.40
+O1     S1     O3   113.83    418.40
+O2     S1     O3   113.83    418.40
+
+
+[ AAR ]
+ [ atoms ]
+  CC     opls_135  -0.600    1
+  BCH2   opls_135  -0.1200   1
+  H1     opls_140   0.6000   1
+  H21    opls_140   0.0600   1
+  H22    opls_140   0.0600   1
+  CD     opls_235   -0.0373  2
+  OD1    opls_236   -0.2673  2
+  N2     opls_238   -0.0431  2
+  C7     opls_136   0.0993   2
+  H2     opls_241   0.1781   2    ; original 0.1785
+  H3     opls_140   0.0349   2
+  H4     opls_140   0.0349   2
+  C8     opls_136  -0.1200   3
+  H5     opls_140   0.0600   3
+  H6     opls_140   0.0600   3
+  C9     opls_136  -0.1976   4
+  N1     opls_103   0.1573   4
+  C4     opls_135   -0.4018  4
+  C5     opls_135   -0.4018  4
+  C1     opls_136   -0.1976  4
+  H7     opls_140   0.2042   4
+  H8     opls_140   0.2042   4
+  H9     opls_140   0.2042   4
+  H10    opls_140   0.2042   4
+  H11    opls_140   0.2042   4
+  H12    opls_140   0.2042   4
+  H13    opls_140   0.2042   4
+  H14    opls_140   0.2042   4
+  H15    opls_140   0.2042   4
+  H16    opls_140   0.2042   4
+  C2     opls_136  -0.1200   5
+  H17    opls_140   0.0600   5
+  H18    opls_140   0.0600   5
+  C3     opls_136   -0.4691  6
+  S1     opls_493   1.4022   6
+  O1     opls_494   -0.7527  6
+  O2     opls_494   -0.7527  6
+  O3     opls_494   -0.7527  6
+  H19    opls_140   0.1625   6
+  H20    opls_140   0.1625   6
+ [ bonds ]
+  CC     CD
+  BCH2   CC
+  CC     H1
+  CD     OD1
+  CD     N2
+  C7     N2
+  H2     N2
+  C7     C8
+  C7     H3
+  C7     H4
+  C8     C9
+  C8     H5
+  C8     H6
+  C9     N1
+  C9     H7
+  C9     H8
+  C4     N1
+  C5     N1
+  C1     N1
+  C4     H9
+  C4     H10
+  C4     H11
+  C5     H12
+  C5     H13
+  C5     H14
+  C1     C2
+  C1     H15
+  C1     H16
+  C2     C3
+  C2     H17
+  C2     H18
+  C3     S1      0.18100   185769.6 ;  CT    S   1  0.18100 185769.6 ; CYX(OL)
+  C3     H19
+  C3     H20
+  O1     S1      0.14577   443504 ;
+  O2     S1      0.14577   443504 ;
+  O3     S1      0.14577   443504 ;
+  BCH2   H21
+  BCH2   H22
+  CC      -BCH2
+  BCH2    +CC
+
+[angles]
+C2     C3     S1  114.700    418.400   ; CYX            SCHERAGA  JPC 79,1428
+C3     S1     O1  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O2  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O3  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+H19    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+H20    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+O1     S1     O2   113.83    418.40
+O1     S1     O3   113.83    418.40
+O2     S1     O3   113.83    418.40
+
+[ AAL ]
+ [ atoms ]
+  CC     opls_135  -0.6000   1
+  CAP2   opls_135  -0.1800   1
+  H1     opls_140   0.6000   1
+  H21    opls_140   0.0600   1
+  H22    opls_140   0.0600   1
+  H23    opls_140   0.0600   1
+  CD     opls_235   -0.0373  2
+  OD1    opls_236   -0.2673  2
+  N2     opls_238   -0.0431  2
+  C7     opls_136   0.0993   2
+  H2     opls_241   0.1781   2              ; original 0.1785      
+  H3     opls_140   0.0349   2
+  H4     opls_140   0.0349   2
+  C8     opls_136  -0.1200   3
+  H5     opls_140   0.0600   3
+  H6     opls_140   0.0600   3
+  C9     opls_136   -0.1976  4
+  N1     opls_103   0.1573   4
+  C4     opls_135   -0.4018  4
+  C5     opls_135   -0.4018  4
+  C1     opls_136   -0.1976  4
+  H7     opls_140   0.2042   4
+  H8     opls_140   0.2042   4
+  H9     opls_140   0.2042   4
+  H10    opls_140   0.2042   4
+  H11    opls_140   0.2042   4
+  H12    opls_140   0.2042   4
+  H13    opls_140   0.2042   4
+  H14    opls_140   0.2042   4
+  H15    opls_140   0.2042   4
+  H16    opls_140   0.2042   4
+  C2     opls_136   -0.1200  5
+  H17    opls_140   0.0600   5
+  H18    opls_140   0.0600   5
+  C3     opls_136   -0.4691  6
+  S1     opls_493   1.4022   6
+  O1     opls_494   -0.7527  6
+  O2     opls_494   -0.7527  6
+  O3     opls_494   -0.7527  6
+  H19    opls_140   0.1625   6
+  H20    opls_140   0.1625   6
+ [ bonds ]
+  CC     CD
+  CAP2   CC
+  CC     H1
+  CD     OD1
+  CD     N2
+  C7     N2
+  H2     N2
+  C7     C8
+  C7     H3
+  C7     H4
+  C8     C9
+  C8     H5
+  C8     H6
+  C9     N1
+  C9     H7
+  C9     H8
+  C4     N1
+  C5     N1
+  C1     N1
+  C4     H9
+  C4     H10
+  C4     H11
+  C5     H12
+  C5     H13
+  C5     H14
+  C1     C2
+  C1     H15
+  C1     H16
+  C2     C3
+  C2     H17
+  C2     H18
+  C3     S1       0.18100   185769.6 ;  CT    S   1  0.18100 185769.6 ; CYX(OL)
+  C3     H19
+  C3     H20
+  O1     S1       0.14577   443504 ;
+  O2     S1       0.14577   443504 ;
+  O3     S1       0.14577   443504 ;
+  CAP2   H21
+  CAP2   H22
+  CAP2   H23
+  CC      -BCH2
+
+[angles]
+C2     C3     S1  114.700    418.400   ; CYX            SCHERAGA  JPC 79,1428
+C3     S1     O1  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O2  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O3  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+H19    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+H20    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+O1     S1     O2   113.83    418.40
+O1     S1     O3   113.83    418.40
+O2     S1     O3   113.83    418.40
+;=========== 3-[[2-(acryloyloxy) ethyl] dimethylammonio] propane-1-sulfonate (A3367) ========
+[ ADF ]
+ [ atoms ]
+  CAP1   opls_135  -0.1800   1
+  H1     opls_140   0.0600   1
+  H2     opls_140   0.0600   1
+  H3     opls_140   0.0600   1
+  CC     opls_135  -0.6000   1
+  BCH2   opls_135  -0.1200   1
+  H4     opls_140   0.6000   1
+  H21    opls_140   0.0600   1
+  H22    opls_140   0.0600   1
+  CD     opls_465   0.2170   2
+  OD2    opls_466   -0.2918  2
+  OD1    opls_467   -0.2421  2
+  CE     opls_490   0.1934   2
+  H5     opls_140   0.0615   2
+  H6     opls_140   0.0615   2
+  C6     opls_136   -0.1976  3
+  N1     opls_103   0.1573   3
+  C4     opls_135   -0.4018  3
+  C5     opls_135   -0.4018  3
+  C1     opls_136   -0.1976  3
+  H7     opls_140   0.2042   3
+  H8     opls_140   0.2042   3
+  H9     opls_140   0.2042   3
+  H10    opls_140   0.2042   3
+  H11    opls_140   0.2042   3
+  H12    opls_140   0.2042   3
+  H13    opls_140   0.2042   3
+  H14    opls_140   0.2042   3
+  H15    opls_140   0.2042   3
+  H16    opls_140   0.2042   3
+  C2     opls_136   -0.1200  4
+  H17    opls_140   0.0600   4
+  H18    opls_140   0.0600   4
+  C3     opls_136   -0.4691  5
+  S1     opls_493   1.4022   5
+  O1     opls_494   -0.7527  5
+  O2     opls_494   -0.7527  5
+  O3     opls_494   -0.7527  5
+  H19    opls_140   0.1625   5
+  H20    opls_140   0.1625   5
+ [ bonds ]
+  CAP1   H1
+  CAP1   H2
+  CAP1   H3
+  CAP1   CC 
+  CC     CD
+  BCH2   CC
+  CC     H4
+  CD     OD2
+  CD     OD1
+  CE     OD1
+  C6     CE
+  CE     H5
+  CE     H6
+  C6     N1
+  C6     H7
+  C6     H8
+  C4     N1
+  C5     N1
+  C1     N1
+  C4     H9
+  C4     H10
+  C4     H11
+  C5     H12
+  C5     H13
+  C5     H14
+  C1     C2
+  C1     H15
+  C1     H16
+  C2     C3
+  C2     H17
+  C2     H18
+  C3     S1      0.18100   185769.6 ;  CT    S   1  0.18100 185769.6 ; CYX(OL)
+  C3     H19
+  C3     H20
+  O1     S1      0.14577   443504 ;
+  O2     S1      0.14577   443504 ;
+  O3     S1      0.14577   443504 ;
+  BCH2   H21
+  BCH2   H22
+  BCH2    +CC
+[angles]
+C2     C3     S1  114.700    418.400   ; CYX            SCHERAGA  JPC 79,1428
+C3     S1     O1  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O2  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O3  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+H19    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+H20    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+O1     S1     O2   113.83    418.40 
+O1     S1     O3   113.83    418.40
+O2     S1     O3   113.83    418.40
+
+[ ADR ]
+ [ atoms ]
+  CC     opls_135   -0.6000   1
+  BCH2   opls_135  -0.1200   1
+  H1     opls_140   0.6000   1
+  H18    opls_140   0.0600   1
+  H19    opls_140   0.0600   1
+  CD     opls_465   0.2170   2
+  OD2    opls_466   -0.2918  2
+  OD1    opls_467   -0.2421  2
+  CE     opls_490   0.1934   2
+  H2     opls_140   0.0615   2
+  H3     opls_140   0.0615   2
+  C6     opls_136   -0.1976  3
+  N1     opls_103   0.1573   3
+  C4     opls_135   -0.4018  3
+  C5     opls_135   -0.4018  3
+  C1     opls_136   -0.1976  3
+  H4     opls_140   0.2042   3
+  H5     opls_140   0.2042   3
+  H6     opls_140   0.2042   3
+  H7     opls_140   0.2042   3
+  H8     opls_140   0.2042   3
+  H9     opls_140   0.2042   3
+  H10    opls_140   0.2042   3
+  H11    opls_140   0.2042   3
+  H12    opls_140   0.2042   3
+  H13    opls_140   0.2042   3
+  C2     opls_136  -0.1200   4
+  H14    opls_140   0.0600   4
+  H15    opls_140   0.0600   4
+  C3     opls_136  -0.4691   5
+  S1     opls_493   1.4022   5
+  O1     opls_494   -0.7527  5
+  O2     opls_494   -0.7527  5
+  O3     opls_494   -0.7527  5
+  H16    opls_140   0.1625   5
+  H17    opls_140   0.1625   5
+ [ bonds ]
+  CC     CD
+  BCH2   CC
+  CC     H1
+  CD     OD2
+  CD     OD1
+  CE     OD1
+  C6     CE
+  CE     H2
+  CE     H3
+  C6     N1
+  C6     H4
+  C6     H5
+  C4     N1
+  C5     N1
+  C1     N1
+  C4     H6
+  C4     H7
+  C4     H8
+  C5     H9
+  C5     H10
+  C5     H11
+  C1     C2
+  C1     H12
+  C1     H13
+  C2     C3
+  C2     H14
+  C2     H15
+  C3     S1       0.18100   185769.6 ;  CT    S   1  0.18100 185769.6 ; CYX(OL)
+  C3     H16
+  C3     H17
+  O1     S1        0.14577   443504 ;
+  O2     S1        0.14577   443504 ;
+  O3     S1        0.14577   443504 ;
+  BCH2   H18
+  BCH2   H19
+  CC      -BCH2
+  BCH2    +CC
+[angles]
+C2     C3     S1  114.700    418.400   ; CYX            SCHERAGA  JPC 79,1428
+C3     S1     O1  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O2  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O3  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+H16    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+H17    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+O1     S1     O2   113.83    418.40 
+O1     S1     O3   113.83    418.40
+O2     S1     O3   113.83    418.40
+
+[ ADL ]
+ [ atoms ]
+  CC     opls_135   -0.6000   1
+  CAP2   opls_135  -0.1800   1
+  H1     opls_140   0.6000   1
+  H18    opls_140   0.0600   1
+  H19    opls_140   0.0600   1
+  H20    opls_140   0.0600   1
+  CD     opls_465   0.2170   2
+  OD2    opls_466   -0.2918  2
+  OD1    opls_467   -0.2421  2
+  CE     opls_490   0.1934   2
+  H2     opls_140   0.0615   2
+  H3     opls_140   0.0615   2
+  C6     opls_136   -0.1976  3
+  N1     opls_103   0.1573   3
+  C4     opls_135   -0.4018  3
+  C5     opls_135   -0.4018  3
+  C1     opls_136   -0.1976  3
+  H4     opls_140   0.2042   3
+  H5     opls_140   0.2042   3
+  H6     opls_140   0.2042   3
+  H7     opls_140   0.2042   3
+  H8     opls_140   0.2042   3
+  H9     opls_140   0.2042   3
+  H10    opls_140   0.2042   3
+  H11    opls_140   0.2042   3
+  H12    opls_140   0.2042   3
+  H13    opls_140   0.2042   3
+  C2     opls_136   -0.1200  4
+  H14    opls_140   0.0600   4
+  H15    opls_140   0.0600   4
+  C3     opls_136   -0.4691  5
+  S1     opls_493   1.4022   5
+  O1     opls_494   -0.7527  5
+  O2     opls_494   -0.7527  5
+  O3     opls_494   -0.7527  5
+  H16    opls_140   0.1625   5
+  H17    opls_140   0.1625   5
+ [ bonds ]
+  CC     CD
+  CAP2   CC
+  CC     H1
+  CD     OD2
+  CD     OD1
+  CE     OD1
+  C6     CE
+  CE     H2
+  CE     H3
+  C6     N1
+  C6     H4
+  C6     H5
+  C4     N1
+  C5     N1
+  C1     N1
+  C4     H6
+  C4     H7
+  C4     H8
+  C5     H9
+  C5     H10
+  C5     H11
+  C1     C2
+  C1     H12
+  C1     H13
+  C2     C3
+  C2     H14
+  C2     H15
+  C3     S1      0.18100   185769.6 ;  CT    S   1  0.18100 185769.6 ; CYX(OL)
+  C3     H16
+  C3     H17
+  O1     S1       0.14577   443504 ;
+  O2     S1       0.14577   443504 ;
+  O3     S1       0.14577   443504 ;
+  CAP2   H18
+  CAP2   H19
+  CAP2   H20
+  CC      -BCH2
+[angles]
+C2     C3     S1  114.700    418.400   ; CYX            SCHERAGA  JPC 79,1428
+C3     S1     O1  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O2  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+C3     S1     O3  108.900    619.232   ; nev,                    copy from OY-SY-CT      rcr HIVRT
+H16    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+H17    C3     S1  109.500    292.880   ; wj                      copy from  CS-CT-HC
+O1     S1     O2   113.83    418.40 
+O1     S1     O3   113.83    418.40
+O2     S1     O3   113.83    418.40
+;-----------------------------------------------------
+;Initiator radical
+[ KPH ]
+ [ atoms ]
+  S1     opls_493   0.70068   1
+  O1     opls_494   -0.42517   1
+  O2     opls_494   -0.42517   1
+  O3     opls_494   -0.42517   1
+  OA     opls_467   -0.42517   1
+
+ [ bonds ]
+  O1     S1
+  O2     S1
+  O3     S1
+  OA     S1
+  OA     +CC
+
+ [ angles ]
+  S1     OA     +CC
+  OA     +CC    +CB
+  OA     +CC    +CD
+  OA     +CC    +BCH2
+
+ [ dihedrals ]
+  S1     OA     +CC    +CB
+  S1     OA     +CC    +CD
+  S1     OA     +CC    +BCH2
+
+
+
+[ KPT ]
+ [ atoms ]
+  OA     opls_467   -0.42517   1
+  S1     opls_493    0.70068   1
+  O1     opls_494   -0.42517   1
+  O2     opls_494   -0.42517   1
+  O3     opls_494   -0.42517   1
+  
+ [ bonds ]
+  OA     -CC
+  OA     S1
+  O1     S1
+  O2     S1
+  O3     S1
+
+ [ angles ]
+  S1     OA     -CC
+  OA     -CC    -CB
+  OA     -CC    -CD
+
+ [ dihedrals ]
+  S1     OA     -CC    -CB
+  S1     OA     -CC    -CD

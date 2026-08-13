@@ -23,11 +23,11 @@ polybuilder.load_user_library(Path(__file__).with_name("cpp_monomers.py"))
 
 # 2. Recipe — tweak these to sweep composition.
 spec = polybuilder.PolymerSpec(
-    first_residue="NIPAM", n_first=3,
+    first_residue="DABCO", n_first=1,
     comonomer="DABCO",       n_comonomer=1,
-    repeats=4,
+    repeats=1,
     cap=True,
-    initiator="KPS", ends="both",
+    initiator="KPT", ends="both",
 )
 
 # 3. Build + write everything into ./out_nipam_vbd/.

@@ -18,7 +18,7 @@ from .config import (
     DMAPS_BASE,
     AtomSpec,
 )
-from .library import get_residue
+from .registry import get_residue
 
 
 def build_dynamic_residue(name: str, extra_bridge: int = 0) -> tuple[str, list[AtomSpec]]:

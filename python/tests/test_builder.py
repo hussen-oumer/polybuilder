@@ -1,7 +1,7 @@
 import pytest
 
 from polybuilder import PolymerSpec, build_polymer
-from polybuilder.exceptions import InvalidPolymerSpecError
+from polybuilder.support.exceptions import InvalidPolymerSpecError
 
 
 def test_polymerspec_rejects_negative_counts():

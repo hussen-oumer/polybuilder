@@ -31,6 +31,7 @@ import warnings
 from collections.abc import Iterable
 from pathlib import Path
 
+from .catalog import EXTRA_INITIATORS, EXTRA_RESIDUES
 from .config import (
     INITIATOR_LIBRARY,
     RESIDUE_LIBRARY,
@@ -39,15 +40,23 @@ from .config import (
     Residue,
     ResidueFragment,
 )
-from .exceptions import PolybuilderError, UnknownMonomerError
+from ..support.exceptions import PolybuilderError, UnknownMonomerError
 
 log = logging.getLogger(__name__)
 
 
+# The full set of built-ins: the core reference monomers/initiators from
+# :mod:`polybuilder.config` plus the extended catalog (A3361, A3367, DABCO,
+# NIPAM, ...) from :mod:`polybuilder.catalog`.  All are available out of the
+# box — no ``--library`` needed.
+BUILTIN_RESIDUES: dict[str, Residue] = {**RESIDUE_LIBRARY, **EXTRA_RESIDUES}
+BUILTIN_INITIATORS: dict[str, Initiator] = {**INITIATOR_LIBRARY, **EXTRA_INITIATORS}
+
+
 # Runtime registries, seeded with the built-in libraries.  User plugins mutate
 # copies of these dicts at load time.
-_REGISTRY: dict[str, Residue] = dict(RESIDUE_LIBRARY)
-_INITIATOR_REGISTRY: dict[str, Initiator] = dict(INITIATOR_LIBRARY)
+_REGISTRY: dict[str, Residue] = dict(BUILTIN_RESIDUES)
+_INITIATOR_REGISTRY: dict[str, Initiator] = dict(BUILTIN_INITIATORS)
 
 
 def register_residue(name: str, residue: Residue, *, overwrite: bool = False) -> None:
@@ -66,6 +75,11 @@ def register_residue(name: str, residue: Residue, *, overwrite: bool = False) ->
             f"got {type(residue).__name__}"
         )
     if name in _REGISTRY and not overwrite:
+        # Re-registering the identical definition is a harmless no-op (e.g. a
+        # user plugin that imports a now-built-in monomer).  Only a genuinely
+        # conflicting redefinition is an error.
+        if _REGISTRY[name] == residue:
+            return
         raise PolybuilderError(
             f"residue '{name}' already registered; pass overwrite=True to replace."
         )
@@ -100,6 +114,9 @@ def register_initiator(name: str, initiator: Initiator, *, overwrite: bool = Fal
             f"register_initiator expected an Initiator, got {type(initiator).__name__}"
         )
     if name in _INITIATOR_REGISTRY and not overwrite:
+        # Re-registering the identical definition is a harmless no-op.
+        if _INITIATOR_REGISTRY[name] == initiator:
+            return
         raise PolybuilderError(
             f"initiator '{name}' already registered; pass overwrite=True to replace."
         )
@@ -203,7 +220,11 @@ def load_user_library(path: os.PathLike | str, *, overwrite: bool = False) -> It
     added = [f"residue:{n}" for n in added_res] + [f"initiator:{n}" for n in added_ini]
 
     if not added:
-        log.warning("user library %s did not register any new monomers or initiators", file)
+        log.info(
+            "user library %s registered no new monomers or initiators "
+            "(they may already be built-in)",
+            file,
+        )
     else:
         log.info("Loaded from %s: %s", file, ", ".join(added))
     return added
@@ -212,9 +233,9 @@ def load_user_library(path: os.PathLike | str, *, overwrite: bool = False) -> It
 def _reset_registry_for_tests() -> None:
     """Restore the registries to the built-in libraries only. Intended for tests."""
     _REGISTRY.clear()
-    _REGISTRY.update(RESIDUE_LIBRARY)
+    _REGISTRY.update(BUILTIN_RESIDUES)
     _INITIATOR_REGISTRY.clear()
-    _INITIATOR_REGISTRY.update(INITIATOR_LIBRARY)
+    _INITIATOR_REGISTRY.update(BUILTIN_INITIATORS)
 
 
 __all__ = [

@@ -11,7 +11,7 @@ from polybuilder import (
     load_user_library,
     register_residue,
 )
-from polybuilder.config import DMAPS_BASE
+from polybuilder.library.config import A3316_BASE, DMAPS_BASE
 from polybuilder.library import _reset_registry_for_tests
 
 
@@ -23,9 +23,13 @@ def _clean_registry():
 
 
 def test_builtins_present():
-    # MMA now lives in the same registry as the sulfobetaines so the builder
-    # can look it up polymorphically.
-    assert set(available_residues()) == {"MMA", "DMAPS", "A3316"}
+    # The extended catalog (A3361, A3367, DABCO, ...) now ships as built-ins so
+    # no --library is needed for the common targets.
+    assert set(available_residues()) == {
+        "MMA", "DMAPS", "A3316",
+        "A3367", "M3295", "A3361",
+        "NIPAM", "IBOA", "VBD", "DABCO", "BVD",
+    }
 
 
 def test_register_and_get_new_betaine():
@@ -39,12 +43,21 @@ def test_register_wrong_type_rejected():
         register_residue("BAD", object())  # type: ignore[arg-type]
 
 
-def test_double_register_requires_overwrite():
+def test_double_register_identical_is_noop():
+    # Re-registering the *same* definition is harmless (a plugin importing a
+    # now-built-in monomer): no error, value unchanged.
+    register_residue("MYMONO", DMAPS_BASE)
+    register_residue("MYMONO", DMAPS_BASE)
+    assert get_residue("MYMONO") is DMAPS_BASE
+
+
+def test_conflicting_register_requires_overwrite():
     register_residue("MYMONO", DMAPS_BASE)
     with pytest.raises(PolybuilderError):
-        register_residue("MYMONO", DMAPS_BASE)
+        register_residue("MYMONO", A3316_BASE)  # different value -> conflict
     # explicit overwrite is allowed
-    register_residue("MYMONO", DMAPS_BASE, overwrite=True)
+    register_residue("MYMONO", A3316_BASE, overwrite=True)
+    assert get_residue("MYMONO") is A3316_BASE
 
 
 def test_unknown_lookup_raises():
@@ -55,7 +68,7 @@ def test_unknown_lookup_raises():
 def test_load_user_library_dict_style(tmp_path):
     lib = tmp_path / "userlib.py"
     lib.write_text(
-        "from polybuilder.config import DMAPS_BASE\n"
+        "from polybuilder.library.config import DMAPS_BASE\n"
         "MONOMERS = {'MYCOPY': DMAPS_BASE}\n"
     )
     added = load_user_library(str(lib))
@@ -67,7 +80,7 @@ def test_load_user_library_register_style(tmp_path):
     lib = tmp_path / "userlib.py"
     lib.write_text(
         "from polybuilder import register_residue\n"
-        "from polybuilder.config import DMAPS_BASE\n"
+        "from polybuilder.library.config import DMAPS_BASE\n"
         "register_residue('MYCOPY', DMAPS_BASE)\n"
     )
     added = load_user_library(str(lib))

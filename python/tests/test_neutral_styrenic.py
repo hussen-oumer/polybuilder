@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from polybuilder import PolymerSpec, build_polymer, load_user_library
-from polybuilder.exceptions import InvalidPolymerSpecError
+from polybuilder.support.exceptions import InvalidPolymerSpecError
 from polybuilder.library import _reset_registry_for_tests
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "cpp_monomers.py"
@@ -38,7 +38,11 @@ def test_builds_copolymer_with_single_fragment_comonomer(tmp_path, comonomer):
     assert result.sequence == ["MMA", comonomer, "MMA", comonomer]
     # Should contain a residue block for the new comonomer prefix.
     rtp_text = rtp.read_text()
-    assert "[ MMC ]" in rtp_text
+    # The head methyl cap is folded into the first residue (MCF for MMA),
+    # not a standalone MMC block, matching the reference aminoacids.rtp layout.
+    assert "[ MMC ]" not in rtp_text
+    assert "[ MCF ]" in rtp_text
+    assert "CAP1" in rtp_text
     assert f"[ {comonomer[:2]}F ]" in rtp_text or f"[ {comonomer[:2]}R ]" in rtp_text
 
 

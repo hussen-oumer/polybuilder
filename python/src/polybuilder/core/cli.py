@@ -15,12 +15,12 @@ import logging
 import sys
 from collections.abc import Sequence
 
-from .builder import PolymerSpec
-from .exceptions import PolybuilderError
-from .inspect import inspect as inspect_pdb_cmd
-from .library import available_initiators, available_residues, load_user_library
+from ..library import available_initiators, available_residues, load_user_library
+from ..support.exceptions import PolybuilderError
+from ..support.inspect import inspect as inspect_pdb_cmd
+from ..support.pubchem import generate_config_entry
+from .builder import PolymerSpec, copolymer, homopolymer
 from .pipeline import run_pipeline
-from .pubchem import generate_config_entry
 
 log = logging.getLogger("polybuilder")
 
@@ -68,6 +68,28 @@ def _library_arg(sp: argparse.ArgumentParser) -> None:
     )
 
 
+def _add_recipe_args(sp: argparse.ArgumentParser) -> None:
+    """Initiator + bridge options shared by the simple ``homo``/``copo`` verbs."""
+    sp.add_argument(
+        "--initiator",
+        default=None,
+        help=(
+            "Optional radical initiator. Built-ins: KPS, SO4, AIBA, TBHP, APS. "
+            "Placed on the chain end(s) chosen by --ends."
+        ),
+    )
+    sp.add_argument(
+        "--ends",
+        default="both",
+        choices=("both", "head", "tail", "none"),
+        help="Which end(s) the initiator caps (default: both). Needs --initiator.",
+    )
+    sp.add_argument(
+        "--bridge", type=int, default=0,
+        help="Extra CH2 groups in a sulfobetaine spacer (default: 0).",
+    )
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="polybuilder",
@@ -81,6 +103,57 @@ def _build_parser() -> argparse.ArgumentParser:
     )
 
     sub = parser.add_subparsers(dest="command", required=True)
+
+    # ---------------- homo (simple homopolymer) ----------------
+    homo_parser = sub.add_parser(
+        "homo",
+        help="Build a homopolymer: one monomer, N units. e.g. 'homo DMAPS -n 20'.",
+    )
+    homo_parser.add_argument(
+        "monomer",
+        help="Monomer name (e.g. DMAPS, A3361, A3367, DABCO). See 'list-monomers'.",
+    )
+    homo_parser.add_argument(
+        "-n", "--count", dest="count", type=int, required=True,
+        help="Number of repeat units in the chain.",
+    )
+    _add_recipe_args(homo_parser)
+    _library_arg(homo_parser)
+    _add_common_output_args(homo_parser)
+
+    # ---------------- copo (simple copolymer) ----------------
+    copo_parser = sub.add_parser(
+        "copo",
+        help="Build a copolymer from two monomers. e.g. 'copo DMAPS DABCO -n 10'.",
+    )
+    copo_parser.add_argument("monomer_a", help="First monomer name.")
+    copo_parser.add_argument("monomer_b", help="Second monomer name.")
+    copo_parser.add_argument(
+        "-n", "--count", dest="count", type=int, default=None,
+        help=(
+            "Simple count. Alternating (default): N of each (ABAB...). "
+            "With --block: one block of N A then N B."
+        ),
+    )
+    copo_parser.add_argument(
+        "--block", action="store_true",
+        help="Make a block copolymer (AAA...BBB...) instead of alternating.",
+    )
+    copo_parser.add_argument(
+        "--na", type=int, default=None,
+        help="Monomer-A units per block (advanced; overrides -n).",
+    )
+    copo_parser.add_argument(
+        "--nb", type=int, default=None,
+        help="Monomer-B units per block (advanced; overrides -n).",
+    )
+    copo_parser.add_argument(
+        "--repeats", type=int, default=None,
+        help="How many times the (na A + nb B) block repeats (advanced; default 1).",
+    )
+    _add_recipe_args(copo_parser)
+    _library_arg(copo_parser)
+    _add_common_output_args(copo_parser)
 
     # ---------------- build ----------------
     build_parser = sub.add_parser("build", help="Build a polymer non-interactively.")
@@ -136,7 +209,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--initiator",
         default=None,
         help=(
-            "Optional radical initiator name. Built-ins: KPS, AIBA, TBHP. "
+            "Optional radical initiator name. Built-ins: KPS, SO4, AIBA, TBHP. "
             "Additional initiators available via --library."
         ),
     )
@@ -335,6 +408,81 @@ def _run_build(args: argparse.Namespace) -> int:
     return 0
 
 
+def _recipe_name(parts: Sequence[str], initiator: str | None) -> str:
+    """Build a filesystem-safe stem like 'DMAPS_n20' or 'DMAPS-DABCO_alt10_KPS'."""
+    stem = "_".join(parts)
+    if initiator:
+        stem += f"_{initiator}"
+    return stem
+
+
+def _run_recipe(spec: PolymerSpec, name: str, args: argparse.Namespace) -> int:
+    """Shared build + report for the simple ``homo``/``copo`` verbs."""
+    result = run_pipeline(
+        spec,
+        output_dir=args.output_dir,
+        run_editconf=not args.no_editconf,
+        keep_intermediates=args.keep_intermediates,
+        final_pdb_name=f"{name}.pdb",
+        final_rtp_name=f"{name}.rtp",
+    )
+    n_res = (spec.n_first + spec.n_comonomer) * spec.repeats + (1 if spec.cap else 0)
+    print(f"Built {name} ({n_res} residues).")
+    print(f"PDB: {result.pdb_path}")
+    print(f"RTP: {result.rtp_path}")
+    return 0
+
+
+def _run_homo(args: argparse.Namespace) -> int:
+    _apply_library(args)
+    spec = homopolymer(
+        args.monomer,
+        args.count,
+        initiator=args.initiator,
+        ends=args.ends,
+        bridge=args.bridge,
+    )
+    name = _recipe_name([args.monomer, f"n{args.count}"], args.initiator)
+    return _run_recipe(spec, name, args)
+
+
+def _run_copo(args: argparse.Namespace) -> int:
+    _apply_library(args)
+
+    # Resolve the block layout for the recipe filename.  Advanced flags
+    # (--na/--nb/--repeats) win; otherwise -n drives a simple chain.  The spec
+    # itself is built by copolymer(), which applies the same precedence.
+    if any(v is not None for v in (args.na, args.nb, args.repeats)):
+        na = args.na if args.na is not None else 1
+        nb = args.nb if args.nb is not None else 1
+        repeats = args.repeats if args.repeats is not None else 1
+        tag = f"{args.monomer_a}{na}-{args.monomer_b}{nb}x{repeats}"
+    elif args.count is not None:
+        if args.block:
+            tag = f"{args.monomer_a}-{args.monomer_b}_block{args.count}"
+        else:
+            tag = f"{args.monomer_a}-{args.monomer_b}_alt{args.count}"
+    else:
+        raise PolybuilderError(
+            "copo needs -n/--count (simple) or --na/--nb/--repeats (advanced)."
+        )
+
+    spec = copolymer(
+        args.monomer_a,
+        args.monomer_b,
+        args.count,
+        block=args.block,
+        na=args.na,
+        nb=args.nb,
+        repeats=args.repeats,
+        initiator=args.initiator,
+        ends=args.ends,
+        bridge=args.bridge,
+    )
+    name = _recipe_name([tag], args.initiator)
+    return _run_recipe(spec, name, args)
+
+
 def _run_pubchem(args: argparse.Namespace) -> int:
     smiles, atoms = generate_config_entry(args.name, args.smiles)
     if smiles is None:
@@ -382,6 +530,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     _configure_logging(args.verbose)
 
     try:
+        if args.command == "homo":
+            return _run_homo(args)
+        if args.command == "copo":
+            return _run_copo(args)
         if args.command == "build":
             return _run_build(args)
         if args.command == "interactive":

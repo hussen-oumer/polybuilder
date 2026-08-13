@@ -25,8 +25,10 @@ from dataclasses import dataclass, field
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from .config import (
+from ..library.config import (
+    BACKBONE_BRIDGE_CHARGE,
     BACKBONE_BRIDGE_TYPE,
+    BACKBONE_CAP_CHARGE,
     BACKBONE_CAP_TYPE,
     HYDROGEN_CHARGE,
     HYDROGEN_FF_TYPE,
@@ -34,10 +36,10 @@ from .config import (
     BetaineBase,
     Initiator,
 )
-from .exceptions import EmbeddingError, InvalidPolymerSpecError
-from .library import get_initiator, get_residue
-from .pdb import write_pdb
-from .rtp import write_rtp
+from ..library import get_initiator, get_residue
+from ..support.exceptions import EmbeddingError, InvalidPolymerSpecError
+from ..write.pdb import write_pdb
+from ..write.rtp import write_rtp
 
 log = logging.getLogger(__name__)
 
@@ -187,6 +189,94 @@ class PolymerSpec:
 
         if errors:
             raise InvalidPolymerSpecError("; ".join(errors))
+
+
+def homopolymer(
+    monomer: str,
+    n: int,
+    *,
+    initiator: str | None = None,
+    ends: str = "both",
+    bridge: int = 0,
+) -> PolymerSpec:
+    """Build a :class:`PolymerSpec` for a homopolymer of ``n`` ``monomer`` units.
+
+    The simple counterpart of the ``polybuilder homo`` CLI verb.  Compose it
+    with :func:`build_polymer` or :func:`~polybuilder.run_pipeline`::
+
+        from polybuilder import homopolymer, run_pipeline
+        run_pipeline(homopolymer("DMAPS", 20, initiator="KPS"), output_dir="out")
+
+    ``bridge`` adds extra CH2 groups to a sulfobetaine spacer (ignored / must be
+    0 for non-sulfobetaine monomers).
+    """
+    return PolymerSpec(
+        first_residue=monomer,
+        comonomer=monomer,   # unused (n_comonomer=0) but required to be set
+        n_first=n,
+        n_comonomer=0,
+        repeats=1,
+        extra_bridge=bridge,
+        initiator=initiator,
+        ends=ends,
+    )
+
+
+def copolymer(
+    monomer_a: str,
+    monomer_b: str,
+    n: int | None = None,
+    *,
+    block: bool = False,
+    na: int | None = None,
+    nb: int | None = None,
+    repeats: int | None = None,
+    initiator: str | None = None,
+    ends: str = "both",
+    bridge: int = 0,
+) -> PolymerSpec:
+    """Build a :class:`PolymerSpec` for a two-monomer copolymer.
+
+    The simple counterpart of the ``polybuilder copo`` CLI verb.  Two ways to
+    specify the layout:
+
+    * Simple — pass ``n``.  Alternating by default (``n`` of each, ABAB...);
+      with ``block=True`` it becomes one block of ``n`` A then ``n`` B.
+    * Advanced — pass any of ``na`` / ``nb`` / ``repeats`` (each defaults to 1)
+      for a repeating ``(na·A + nb·B)`` block.  These win over ``n``.
+
+    ::
+
+        copolymer("DMAPS", "DABCO", 10)                    # alternating, 10 each
+        copolymer("DMAPS", "DABCO", 10, block=True)        # 10 A then 10 B
+        copolymer("DMAPS", "A3367", na=3, nb=1, repeats=4) # (AAAB) x4
+    """
+    if any(v is not None for v in (na, nb, repeats)):
+        na_r = na if na is not None else 1
+        nb_r = nb if nb is not None else 1
+        repeats_r = repeats if repeats is not None else 1
+    elif n is not None:
+        if block:
+            na_r = nb_r = n
+            repeats_r = 1
+        else:
+            na_r = nb_r = 1
+            repeats_r = n
+    else:
+        raise InvalidPolymerSpecError(
+            "copolymer needs n (simple) or na/nb/repeats (advanced)."
+        )
+
+    return PolymerSpec(
+        first_residue=monomer_a,
+        comonomer=monomer_b,
+        n_first=na_r,
+        n_comonomer=nb_r,
+        repeats=repeats_r,
+        extra_bridge=bridge,
+        initiator=initiator,
+        ends=ends,
+    )
 
 
 @dataclass
@@ -353,7 +443,12 @@ def _init_residue_labels(initiator: Initiator | None) -> tuple[str, str, str]:
     if initiator is None:
         return "MMC", "MMC", "MMC"
     stem = "".join(c for c in initiator.name.upper() if c.isalnum())[:2]
-    return f"{stem}H", f"{stem}T", f"{stem}M"
+    # Honour explicit per-initiator block-code overrides (e.g. SO4 → KPH/KPT)
+    # and fall back to the two-letter stem otherwise.
+    head = initiator.head_res or f"{stem}H"
+    tail = initiator.tail_res or f"{stem}T"
+    mid = initiator.mid_res or f"{stem}M"
+    return head, tail, mid
 
 
 def _label_heavy_atoms(
@@ -386,6 +481,10 @@ def _label_heavy_atoms(
         atom.SetProp("cgnr", str(spec_atom.cgnr))
         atom.SetProp("res", res_label)
         atom.SetProp("resnum", str(res_num))
+        # Stash the per-parent hydrogen charge so _label_hydrogens can give each
+        # H the OPLS charge that matches its heavy-atom neighbour.
+        if spec_atom.h_charge is not None:
+            atom.SetProp("hq", f"{spec_atom.h_charge:.4f}")
 
     # ---- HEAD cap (methyl or initiator head fragment) ------------------
     if cap_head and initiator is not None:
@@ -397,17 +496,24 @@ def _label_heavy_atoms(
                 )
             _apply(heavy[h_idx], spec_atom, spec_atom.name, head_res_label, resnum)
             h_idx += 1
+        # Initiator head atoms form their own residue block (e.g. KPH).
+        resnum += 1
     else:
-        # Single methyl cap (legacy behaviour).
+        # Default methyl head cap (CAP1).  Fold it INTO the first monomer
+        # residue — same residue number and residue code — so the emitted
+        # PDB/RTP match the reference aminoacids.rtp layout, whose first-residue
+        # blocks (DMF, MCF, ...) contain CAP1 rather than a standalone cap
+        # residue.  This mirrors how the tail CAP2 is folded into the last
+        # residue.  No resnum bump: CAP1 shares the first monomer's residue.
+        first_label = (_prefix_for(sequence[0]) + "F")[:3]
         cap1 = heavy[h_idx]
         cap1.SetProp("name", "CAP1")
-        cap1.SetProp("res", "MMC")
-        cap1.SetProp("type", "opls_135")
-        cap1.SetProp("charge", "0.0000")
+        cap1.SetProp("res", first_label)
+        cap1.SetProp("type", BACKBONE_CAP_TYPE)
+        cap1.SetProp("charge", f"{BACKBONE_CAP_CHARGE:.4f}")
         cap1.SetProp("cgnr", "1")
         cap1.SetProp("resnum", str(resnum))
         h_idx += 1
-    resnum += 1
 
     # ---- Residues + inter-residue bridges (or mid-chain initiators) ---
     for i, res_name in enumerate(sequence):
@@ -452,7 +558,7 @@ def _label_heavy_atoms(
                 bridge = heavy[h_idx]
                 bridge.SetProp("name", "CAP2")
                 bridge.SetProp("type", BACKBONE_CAP_TYPE)
-                bridge.SetProp("charge", "0.0000")
+                bridge.SetProp("charge", f"{BACKBONE_CAP_CHARGE:.4f}")
                 bridge.SetProp("cgnr", "1")
                 bridge.SetProp("res", r_label)
                 bridge.SetProp("resnum", str(res_num_i))
@@ -485,7 +591,7 @@ def _label_heavy_atoms(
             bridge = heavy[h_idx]
             bridge.SetProp("name", "BCH2")
             bridge.SetProp("type", BACKBONE_BRIDGE_TYPE)
-            bridge.SetProp("charge", "0.0000")
+            bridge.SetProp("charge", f"{BACKBONE_BRIDGE_CHARGE:.4f}")
             bridge.SetProp("cgnr", "1")
             bridge.SetProp("res", r_label)
             bridge.SetProp("resnum", str(res_num_i))
@@ -500,7 +606,9 @@ def _label_heavy_atoms(
 
 
 def _label_hydrogens(mol: Chem.Mol) -> None:
-    # inherit residue + charge-group from bonded heavy atom
+    # inherit residue + charge-group from bonded heavy atom, and take the
+    # hydrogen's partial charge from that parent's per-parent `hq` (set from
+    # AtomSpec.h_charge) — falling back to the global aliphatic-H default.
     for atom in mol.GetAtoms():
         if atom.GetSymbol() != "H":
             continue
@@ -511,6 +619,8 @@ def _label_hydrogens(mol: Chem.Mol) -> None:
         for key in ("res", "resnum", "cgnr"):
             if parent.HasProp(key):
                 atom.SetProp(key, parent.GetProp(key))
+        hq = parent.GetProp("hq") if parent.HasProp("hq") else f"{HYDROGEN_CHARGE:.4f}"
+        atom.SetProp("charge", hq)
 
     # unique H names per residue
     res_nums = sorted(
@@ -530,7 +640,6 @@ def _label_hydrogens(mol: Chem.Mol) -> None:
         for idx, h in enumerate(res_h, 1):
             h.SetProp("name", f"H{idx}")
             h.SetProp("type", HYDROGEN_FF_TYPE)
-            h.SetProp("charge", f"{HYDROGEN_CHARGE:.4f}")
 
 
 def build_polymer(
@@ -622,4 +731,10 @@ def build_polymer(
     )
 
 
-__all__ = ["PolymerSpec", "PolymerResult", "build_polymer"]
+__all__ = [
+    "PolymerSpec",
+    "PolymerResult",
+    "build_polymer",
+    "homopolymer",
+    "copolymer",
+]

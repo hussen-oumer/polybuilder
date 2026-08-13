@@ -11,7 +11,7 @@ import logging
 
 from rdkit import Chem
 
-from .config import UNKNOWN_FF_TYPE, AtomSpec
+from ..library.config import UNKNOWN_FF_TYPE, AtomSpec
 from .exceptions import InvalidSmilesError
 
 log = logging.getLogger(__name__)

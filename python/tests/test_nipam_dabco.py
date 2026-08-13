@@ -9,7 +9,7 @@ from polybuilder import (
     build_polymer,
     load_user_library,
 )
-from polybuilder.exceptions import InvalidPolymerSpecError
+from polybuilder.support.exceptions import InvalidPolymerSpecError
 from polybuilder.library import _reset_registry_for_tests
 
 EXAMPLE = Path(__file__).resolve().parent.parent / "examples" / "cpp_monomers.py"

@@ -1,7 +1,7 @@
 import pytest
 
-from polybuilder.exceptions import InvalidSmilesError
-from polybuilder.pubchem import generate_config_entry
+from polybuilder.support.exceptions import InvalidSmilesError
+from polybuilder.support.pubchem import generate_config_entry
 
 
 def test_methacrylate_gets_alpha_methyl_type():

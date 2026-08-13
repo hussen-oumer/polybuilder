@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from polybuilder.pdb import interleave_pdb
+from polybuilder.write.pdb import interleave_pdb
 
 
 def _write(path: Path, lines):

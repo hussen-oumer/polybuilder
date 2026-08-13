@@ -1,4 +1,4 @@
-from polybuilder.config import (
+from polybuilder.library.config import (
     A3316_BASE,
     BETAINE_LIBRARY,
     DMAPS_BASE,

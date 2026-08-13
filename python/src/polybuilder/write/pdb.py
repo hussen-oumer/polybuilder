@@ -32,40 +32,107 @@ _H_BOND_CUTOFF: float = 1.3
 def write_pdb(mol: Chem.Mol, path: str) -> str:
     """Write a labelled molecule to ``path`` as a minimal PDB file.
 
+    Atoms are emitted **residue by residue** (ascending residue number), each
+    heavy atom immediately followed by its bonded hydrogens.  This ordering is
+    required by MD pre-processors such as ``gmx pdb2gmx``, which start a new
+    residue whenever the residue number changes: RDKit appends every hydrogen
+    after every heavy atom, so a naive index walk would emit residue numbers
+    like ``1,2,3,…,N,1,2,3,…`` and pdb2gmx would treat the repeated numbers as
+    duplicate residues and fail.  The hydrogen→parent mapping uses the RDKit
+    bond graph (not interatomic distance), so it is exact regardless of
+    geometry — no separate distance-based interleave pass is needed.
+
     Emits ``CONECT`` records covering every bond in the RDKit molecule so
     downstream viewers render the correct connectivity regardless of the
     inter-atomic distances (bond guessing by distance can miss slightly
     stretched C–N⁺ bonds).
     """
     conf = mol.GetConformer()
+    order = _residue_ordered_indices(mol)
+    old_to_new = {old_idx: serial for serial, old_idx in enumerate(order, 1)}
     with open(path, "w") as fh:
-        for i, atom in enumerate(mol.GetAtoms(), 1):
-            pos = conf.GetAtomPosition(i - 1)
-            name = atom.GetProp("name") if atom.HasProp("name") else f"{atom.GetSymbol()}{i}"
+        for serial, old_idx in enumerate(order, 1):
+            atom = mol.GetAtomWithIdx(old_idx)
+            pos = conf.GetAtomPosition(old_idx)
+            name = (
+                atom.GetProp("name")
+                if atom.HasProp("name")
+                else f"{atom.GetSymbol()}{serial}"
+            )
             res = atom.GetProp("res") if atom.HasProp("res") else "UNK"
             resnum = int(atom.GetProp("resnum")) if atom.HasProp("resnum") else 1
             fh.write(
-                f"ATOM  {i:5d} {name:<4s} {res:3s} A{resnum:4d}    "
+                f"ATOM  {serial:5d} {name:<4s} {res:3s} A{resnum:4d}    "
                 f"{pos.x:8.3f}{pos.y:8.3f}{pos.z:8.3f}  1.00  0.00           "
                 f"{atom.GetSymbol()}\n"
             )
         fh.write("TER\n")
-        _write_conect_records(fh, mol)
+        _write_conect_records(fh, mol, order, old_to_new)
         fh.write("END\n")
     return path
 
 
-def _write_conect_records(fh, mol: Chem.Mol) -> None:
-    """Emit one CONECT line per atom listing its bonded partners (1-indexed serials)."""
-    for i, atom in enumerate(mol.GetAtoms(), 1):
-        neighbors = sorted(nb.GetIdx() + 1 for nb in atom.GetNeighbors())
+def _residue_ordered_indices(mol: Chem.Mol) -> list[int]:
+    """Return RDKit atom indices in pdb2gmx-friendly order.
+
+    Groups atoms by residue number (ascending) and, within each residue,
+    emits every heavy atom in its original index order immediately followed
+    by the hydrogens bonded to it.  Atoms without a ``resnum`` tag sort to the
+    end so nothing is silently dropped.
+    """
+    def resnum_of(atom: Chem.Atom) -> int:
+        if atom.HasProp("resnum"):
+            try:
+                return int(atom.GetProp("resnum"))
+            except ValueError:
+                pass
+        return 1_000_000_000  # untagged atoms go last, preserving them
+
+    heavy_by_res: dict[int, list[Chem.Atom]] = {}
+    for atom in mol.GetAtoms():
+        if atom.GetSymbol() == "H":
+            continue
+        heavy_by_res.setdefault(resnum_of(atom), []).append(atom)
+
+    order: list[int] = []
+    seen: set[int] = set()
+    for rnum in sorted(heavy_by_res):
+        for heavy in heavy_by_res[rnum]:
+            order.append(heavy.GetIdx())
+            seen.add(heavy.GetIdx())
+            for nb in heavy.GetNeighbors():
+                if nb.GetSymbol() == "H" and nb.GetIdx() not in seen:
+                    order.append(nb.GetIdx())
+                    seen.add(nb.GetIdx())
+
+    # Sweep up anything not reached above (isolated H, untagged heavy atoms).
+    for atom in mol.GetAtoms():
+        if atom.GetIdx() not in seen:
+            order.append(atom.GetIdx())
+            seen.add(atom.GetIdx())
+    return order
+
+
+def _write_conect_records(
+    fh, mol: Chem.Mol, order: list[int], old_to_new: Mapping[int, int]
+) -> None:
+    """Emit one CONECT line per atom listing its bonded partners.
+
+    Serials use the post-reorder numbering (``old_to_new``) so the records
+    reference the same atoms written above.  Lines are emitted in ascending
+    serial order (i.e. in ``order``).
+    """
+    for old_idx in order:
+        atom = mol.GetAtomWithIdx(old_idx)
+        central = old_to_new[old_idx]
+        neighbors = sorted(old_to_new[nb.GetIdx()] for nb in atom.GetNeighbors())
         if not neighbors:
             continue
         # The PDB CONECT format allows up to 4 partners per line; wrap if more.
         for chunk_start in range(0, len(neighbors), 4):
             chunk = neighbors[chunk_start:chunk_start + 4]
             parts = "".join(f"{n:>5d}" for n in chunk)
-            fh.write(f"CONECT{i:>5d}{parts}\n")
+            fh.write(f"CONECT{central:>5d}{parts}\n")
 
 
 def _element_of(line: str) -> str:

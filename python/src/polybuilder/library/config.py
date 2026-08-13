@@ -25,12 +25,19 @@ class AtomSpec:
     ff_type:  OPLS-AA atom-type token (e.g. ``opls_135``).
     charge:   Partial charge in |e|; 0.0 is a valid placeholder to be refined.
     cgnr:     Charge-group number used by GROMACS to bundle atoms.
+    h_charge: Partial charge assigned to hydrogens bonded to *this* heavy atom.
+              In OPLS-AA a hydrogen's charge depends on its parent (0.06 on a
+              plain alkane C, 0.2042 on an ammonium N–CH2/N–CH3, 0.1625 on a
+              CH2 next to a sulfonate, ...).  ``None`` falls back to the global
+              :data:`HYDROGEN_CHARGE` default.  Heavy atoms with no hydrogens
+              (S, O, quaternary C) leave this ``None``.
     """
 
     name: str
     ff_type: str
     charge: float
     cgnr: int
+    h_charge: float | None = None
 
     def as_tuple(self) -> tuple[str, str, float, int]:
         return (self.name, self.ff_type, self.charge, self.cgnr)
@@ -107,15 +114,18 @@ def _atoms(*entries: tuple[str, str, float, int]) -> tuple[AtomSpec, ...]:
 # ---------------------------------------------------------------------------
 # MMA (methyl methacrylate) — a self-contained residue.
 # ---------------------------------------------------------------------------
+# Charges are OPLS-AA methyl-methacrylate values (from the reference MCF block
+# in aminoacids.rtp).  5th tuple element = charge of the hydrogens on that heavy
+# atom.  The repeat unit (with its neutral backbone CH2 bridge) is net neutral.
 MMA_RESIDUE: ResidueFragment = ResidueFragment(
     smiles="C(C)(C(=O)OC)",
     atoms=_atoms(
-        ("CC", "opls_139", 0.0000, 1),
-        ("CB", "opls_135", 0.0000, 2),
-        ("CD", "opls_465", 0.0000, 3),
-        ("OD2", "opls_466", 0.0000, 3),
-        ("OD1", "opls_467", 0.0000, 3),
-        ("CE", "opls_490", 0.0000, 3),
+        ("CC", "opls_139", 0.0000, 1),           # quaternary backbone C (no H)
+        ("CB", "opls_135", -0.1800, 2, 0.0600),  # alpha-methyl -CH3
+        ("CD", "opls_465", 0.2170, 3),           # ester carbonyl C
+        ("OD2", "opls_466", -0.2918, 3),         # ester =O
+        ("OD1", "opls_467", -0.2421, 3),         # ester -O-
+        ("CE", "opls_490", 0.1324, 3, 0.0615),   # -O-CH3
     ),
 )
 
@@ -123,42 +133,49 @@ MMA_RESIDUE: ResidueFragment = ResidueFragment(
 # ---------------------------------------------------------------------------
 # DMAPS — dimethyl(methacryloyloxyethyl)ammonio propanesulfonate.
 # ---------------------------------------------------------------------------
+# Charges are OPLS-AA sulfobetaine values (from the reference DMF block in
+# aminoacids.rtp).  The zwitterion is net neutral: the +1 quaternary ammonium
+# (N1 + its N-CH2/N-CH3 groups) balances the -1 sulfonate (S1 + O1/O2/O3).
 DMAPS_BASE: BetaineBase = BetaineBase(
     head=ResidueFragment(
         smiles="C(C)(C(=O)OCC[N+](C)(C)",
         atoms=_atoms(
-            ("CC", "opls_139", 0.0000, 4),
-            ("CB", "opls_135", 0.0000, 4),
-            ("CD", "opls_465", 0.0000, 5),
-            ("OD2", "opls_466", 0.0000, 5),
-            ("OD1", "opls_467", 0.0000, 5),
-            ("CE", "opls_490", 0.0000, 5),
-            ("C6", "opls_136", 0.0000, 3),
-            ("N1", "opls_103", 0.0000, 3),
-            ("C4", "opls_135", 0.0000, 3),
-            ("C5", "opls_135", 0.0000, 3),
+            ("CC", "opls_139", 0.0000, 4),           # quaternary backbone C (no H)
+            ("CB", "opls_135", -0.1800, 4, 0.0600),  # alpha-methyl -CH3
+            ("CD", "opls_465", 0.2170, 5),           # ester carbonyl C
+            ("OD2", "opls_466", -0.2918, 5),         # ester =O
+            ("OD1", "opls_467", -0.2421, 5),         # ester -O-
+            ("CE", "opls_490", 0.1934, 5, 0.0615),   # -O-CH2-
+            ("C6", "opls_136", -0.1976, 3, 0.2042),  # -CH2-N+
+            ("N1", "opls_103", 0.1573, 3),           # quaternary N+ (no H)
+            ("C4", "opls_135", -0.4018, 3, 0.2042),  # N+-CH3
+            ("C5", "opls_135", -0.4018, 3, 0.2042),  # N+-CH3
         ),
     ),
     tail=ResidueFragment(
         smiles="CCCS(=O)(=O)[O-])",
         atoms=_atoms(
-            ("C1", "opls_136", 0.0000, 1),
-            ("C2", "opls_136", 0.0000, 1),
-            ("C3", "opls_136", 0.0000, 1),
-            ("S1", "opls_493", 0.0000, 1),
-            ("O1", "opls_494", 0.0000, 1),
-            ("O2", "opls_494", 0.0000, 1),
-            ("O3", "opls_494", 0.0000, 1),
+            ("C1", "opls_136", -0.1976, 1, 0.2042),  # N+-CH2-
+            ("C2", "opls_136", -0.1200, 1, 0.0600),  # -CH2-
+            ("C3", "opls_136", -0.4691, 1, 0.1625),  # -CH2-SO3
+            ("S1", "opls_493", 1.4022, 1),           # sulfonate S (no H)
+            ("O1", "opls_494", -0.7527, 1),          # sulfonate O
+            ("O2", "opls_494", -0.7527, 1),
+            ("O3", "opls_494", -0.7527, 1),
         ),
     ),
     bridge_ff_type="opls_136",
-    bridge_charge=0.0,
+    bridge_charge=-0.12,   # tunable extra -CH2- spacer (H default 0.06)
     bridge_cgnr=3,
 )
 
 
 # ---------------------------------------------------------------------------
 # A3316 — acrylamide-derived sulfobetaine.
+# NOTE: charges are still 0.0 placeholders.  The only reference block for this
+# chemistry in aminoacids.rtp (AAF/AAR/AAL) contains artifacts (e.g. a hydrogen
+# with charge +0.6), so it is not a trustworthy source.  Populate h_charge/charge
+# here from a clean OPLS parameterization before using A3316 in production.
 # ---------------------------------------------------------------------------
 A3316_BASE: BetaineBase = BetaineBase(
     head=ResidueFragment(
@@ -242,6 +259,14 @@ class Initiator:
     tail_atoms: tuple[AtomSpec, ...]
     mid_smiles: str | None = None
     mid_atoms: tuple[AtomSpec, ...] | None = None
+    # Optional overrides for the 3-letter RTP residue codes of the head/tail/
+    # mid cap blocks.  When ``None`` the builder derives them from the first
+    # two alphanumeric characters of ``name`` (e.g. KPS → KPH/KPT/KPM).  The
+    # SO4 sulfate-radical initiator sets these to KPH/KPT so its end caps share
+    # the reference ``aminoacids.rtp`` block names.
+    head_res: str | None = None
+    tail_res: str | None = None
+    mid_res: str | None = None
 
 
 # --- KPS (potassium persulfate → sulfate radical: -O-SO3⁻) -----------------
@@ -249,25 +274,28 @@ KPS_INITIATOR: Initiator = Initiator(
     name="KPS",
     # HEAD fragment ends with the attachment O so `head + Cα...` bonds α-C to
     # the trailing O of the sulfate ester.
+    # Charges: OPLS sulfate-ester head group, net -1 (from reference KPH block).
     head_smiles="S(=O)(=O)([O-])O",
     head_atoms=_atoms(
-        ("S1", "opls_493", 0.0, 1),
-        ("O1", "opls_494", 0.0, 1),
-        ("O2", "opls_494", 0.0, 1),
-        ("O3", "opls_494", 0.0, 1),   # anionic O (formal -1)
-        ("OA", "opls_467", 0.0, 1),   # attachment O (ester-like)
+        ("S1", "opls_493", 0.70068, 1),
+        ("O1", "opls_494", -0.42517, 1),
+        ("O2", "opls_494", -0.42517, 1),
+        ("O3", "opls_494", -0.42517, 1),   # anionic O (formal -1)
+        ("OA", "opls_467", -0.42517, 1),   # attachment O (ester-like)
     ),
     # TAIL fragment starts with the attachment O so `...Cα + tail` bonds
-    # α-C to the leading O.
+    # α-C to the leading O.  Charges: net -1 (from reference KPT block).
     tail_smiles="OS(=O)(=O)[O-]",
     tail_atoms=_atoms(
-        ("OA", "opls_467", 0.0, 1),   # attachment O
-        ("S1", "opls_493", 0.0, 1),
-        ("O1", "opls_494", 0.0, 1),
-        ("O2", "opls_494", 0.0, 1),
-        ("O3", "opls_494", 0.0, 1),
+        ("OA", "opls_467", -0.42517, 1),   # attachment O
+        ("S1", "opls_493", 0.70068, 1),
+        ("O1", "opls_494", -0.42517, 1),
+        ("O2", "opls_494", -0.42517, 1),
+        ("O3", "opls_494", -0.42517, 1),
     ),
     # MID fragment = full persulfate bridge  -O-SO2(O⁻)-O-O-SO2(O⁻)-O-
+    # NOTE: mid-chain persulfate charges are left at 0.0 (no clean reference
+    # block yet); refine before using KPS mid-chain insertion in production.
     # inserted between two residues.  10 heavy atoms, net -2 charge.
     mid_smiles="OS(=O)([O-])OOS(=O)([O-])O",
     mid_atoms=_atoms(
@@ -282,6 +310,42 @@ KPS_INITIATOR: Initiator = Initiator(
         ("O4",  "opls_494", 0.0, 1),  # anionic O
         ("OA2", "opls_467", 0.0, 1),  # attachment O (bonds to next α-C)
     ),
+)
+
+# --- SO4 (sulfate radical end cap: backbone-C-O-SO3⁻) -----------------------
+# Same sulfate-radical chemistry as KPS (potassium persulfate → •O-SO3⁻), but
+# exposed as its own selectable initiator for the DMAPS / A3361 / A3367
+# sulfobetaines.  Chosen with ``--initiator SO4``; when no initiator is
+# selected the chain ends stay the default CAP1 / CAP2 methyls.
+#
+# The head/tail caps get the reference ``aminoacids.rtp`` block names KPH / KPT
+# (via head_res / tail_res) so the SO4 group cleanly stands in for the CAP1 /
+# CAP2 methyls it replaces.  Head/tail only — no mid-chain persulfate bridge.
+SO4_INITIATOR: Initiator = Initiator(
+    name="SO4",
+    # HEAD fragment ends with the attachment O so `head + Cα...` bonds the
+    # α-C to the trailing ester-like O of the sulfate.
+    # Charges: OPLS sulfate-ester head group, net -1 (from reference KPH block).
+    head_smiles="S(=O)(=O)([O-])O",
+    head_atoms=_atoms(
+        ("S1", "opls_493", 0.70068, 1),
+        ("O1", "opls_494", -0.42517, 1),
+        ("O2", "opls_494", -0.42517, 1),
+        ("O3", "opls_494", -0.42517, 1),   # anionic O (formal -1)
+        ("OA", "opls_467", -0.42517, 1),   # attachment O (ester-like)
+    ),
+    # TAIL fragment starts with the attachment O so `...Cα + tail` bonds the
+    # α-C to the leading O.  Charges: net -1 (from reference KPT block).
+    tail_smiles="OS(=O)(=O)[O-]",
+    tail_atoms=_atoms(
+        ("OA", "opls_467", -0.42517, 1),   # attachment O
+        ("S1", "opls_493", 0.70068, 1),
+        ("O1", "opls_494", -0.42517, 1),
+        ("O2", "opls_494", -0.42517, 1),
+        ("O3", "opls_494", -0.42517, 1),
+    ),
+    head_res="KPH",
+    tail_res="KPT",
 )
 
 # --- AIBA (amidinium end: -C(=NH2+)(NH2)) ----------------------------------
@@ -325,22 +389,29 @@ TBHP_INITIATOR: Initiator = Initiator(
 
 INITIATOR_LIBRARY: dict[str, Initiator] = {
     "KPS": KPS_INITIATOR,
+    "SO4": SO4_INITIATOR,
     "AIBA": AIBA_INITIATOR,
     "TBHP": TBHP_INITIATOR,
 }
 
 
-# Default charge for placeholder hydrogen atoms.
+# Default charge for a hydrogen whose parent heavy atom does not override it
+# via ``AtomSpec.h_charge``.  0.06 |e| is the OPLS-AA value for a hydrogen on a
+# plain aliphatic carbon (opls_140 on opls_135/136/139).
 HYDROGEN_FF_TYPE: str = "opls_140"
-HYDROGEN_CHARGE: float = 0.0
+HYDROGEN_CHARGE: float = 0.06
 
 # Placeholder OPLS type emitted by :mod:`polybuilder.pubchem` for atoms the
 # heuristic converter cannot classify.
 UNKNOWN_FF_TYPE: str = "opls_XXX"
 
-# Backbone atom names / force-field parameters used by the builder.
+# Backbone atom names / force-field parameters used by the builder.  The methyl
+# end cap (CAP1/CAP2) is a neutral -CH3 group (C -0.18, 3 H +0.06); the
+# inter-residue methylene bridge (BCH2) is a neutral -CH2- (C -0.12, 2 H +0.06).
 BACKBONE_CAP_TYPE: str = "opls_135"
+BACKBONE_CAP_CHARGE: float = -0.18
 BACKBONE_BRIDGE_TYPE: str = "opls_135"
+BACKBONE_BRIDGE_CHARGE: float = -0.12
 
 # Fields that make it easy to iterate library monomers programmatically.
 KNOWN_MONOMERS: tuple[str, ...] = ("MMA",) + tuple(BETAINE_LIBRARY)
@@ -358,6 +429,7 @@ __all__ = [
     "BETAINE_LIBRARY",
     "RESIDUE_LIBRARY",
     "KPS_INITIATOR",
+    "SO4_INITIATOR",
     "AIBA_INITIATOR",
     "TBHP_INITIATOR",
     "INITIATOR_LIBRARY",
@@ -365,6 +437,8 @@ __all__ = [
     "HYDROGEN_CHARGE",
     "UNKNOWN_FF_TYPE",
     "BACKBONE_CAP_TYPE",
+    "BACKBONE_CAP_CHARGE",
     "BACKBONE_BRIDGE_TYPE",
+    "BACKBONE_BRIDGE_CHARGE",
     "KNOWN_MONOMERS",
 ]

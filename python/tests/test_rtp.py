@@ -1,5 +1,5 @@
 
-from polybuilder.rtp import reorder_rtp_by_cgnr
+from polybuilder.write.rtp import reorder_rtp_by_cgnr
 
 
 def test_reorder_rtp_by_cgnr_sorts_atoms(tmp_path):

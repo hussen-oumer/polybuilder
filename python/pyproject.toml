@@ -36,7 +36,7 @@ dev = [
 ]
 
 [project.scripts]
-polybuilder = "polybuilder.cli:main"
+polybuilder = "polybuilder.core.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/hussen-oumer/polybuilder"
