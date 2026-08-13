@@ -204,6 +204,7 @@ INITIATORS = {"APS": APS}
 
 Polybuilder writes only the covalent polymer, so cationic residues (e.g. VBD) leave a net positive charge. Add counter-ions during solvation:
 
+
 ```bash
 gmx pdb2gmx  -f poly.pdb -o poly.gro -p topol.top -water tip3p
 gmx editconf -f poly.gro -o poly_box.gro -c -d 1.0 -bt cubic
